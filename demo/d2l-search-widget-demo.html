@@ -13,10 +13,14 @@
 		</script>
 		<link rel="import" href="../d2l-search-widget.html">
 	</head>
-	<body unresolved class="d2l-typography">
+	<body unresolved>
 		<main class="max-width">
 			<h1>d2l-search-widget demo</h1>
-			<d2l-search-widget></d2l-alert>
+			<d2l-search-widget
+				search-action='{"name":"search-my-enrollments","method":"GET","href":"/components/d2l-search-widget/demo/enrollmentsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"pageSize","type":"number","value":20},{"name":"embedDepth","type":"number","value":0},{"name":"sortField","type":"radio","value":""},{"name":"sortDescending","type":"checkbox","value":false},{"name":"parentOrganizationIds","type":"hidden","value":""}]}'
+				search-action-name="search-my-enrollments"
+				search-field-name="search"
+				live-search></d2l-search-widget>
 		</main>
 	</body>
 </html>

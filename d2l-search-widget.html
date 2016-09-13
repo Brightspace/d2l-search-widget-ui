@@ -1,8 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../d2l-ajax/d2l-ajax.html">
 <link rel="import" href="../d2l-dropdown/d2l-dropdown.html">
+<link rel="import" href="../d2l-icons/d2l-icons.html">
 <link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
 <link rel="import" href="../d2l-typography/d2l-typography-shared-styles.html">
 <link rel="import" href="localize-behavior.html">
@@ -26,7 +28,6 @@
 				padding: 0;
 				margin: 0;
 			}
-
 			input {
 				width: 100%;
 				height: 60px;
@@ -52,7 +53,6 @@
 				padding-left: 65px;
 				padding-right: 65px;
 			}
-
 			input:focus,
 			input:hover {
 				border-color: var(--d2l-color-celestine);
@@ -63,19 +63,15 @@
 				padding-left: 64px;
 				padding-right: 64px;
 			}
-
 			.dropdown-content {
 				background: transparent;
 			}
-
 			d2l-dropdown {
 				min-width: 100%;
 			}
-
 			d2l-search-listbox {
 				border-radius: 6px;
 			}
-
 			.search-icon {
 				position: absolute;
 				top: 0px;
@@ -95,22 +91,13 @@
 				height: 30px;
 				color: var(--d2l-color-tungsten);
 			}
-
 			.search-button {
 				left: 5px;
 			}
-
 			.clear-search-button {
 				right: 5px;
 			}
 		</style>
-
-		<d2l-ajax
-			id="searchRootRequest"
-			url="[[searchRootUrl]]"
-			headers='{ "Accept": "application/vnd.siren+json" }'
-			on-iron-ajax-response="_onSearchRootResponse">
-		</d2l-ajax>
 
 		<d2l-ajax
 			id="searchRequest"
@@ -151,7 +138,7 @@
 							<d2l-search-listbox>
 								<div class="d2l-heading-4" data-list-title disabled>{{localize('recentSearches')}}</div>
 								<template is="dom-repeat" items="[[_previousSearches]]">
-									<div selectable data-text$="[[item]]" data-href$="[[_computePreviousSearchLink(item)]]" role="option">
+									<div selectable data-text$="[[item]]" role="option">
 										[[item]]
 									</div>
 								</template>
@@ -186,56 +173,27 @@
 
 			properties: {
 				/*
-				* Root search URL, which should have the search Action in the response
+				* Hypermedia Entity that contains search Action
+				*/
+				searchAction: {
+					type: Object,
+					observer: '_onSearchActionChanged'
+				},
+				/*
+				* Name of the Hypermedia Field that typing into the search field mutates
 				* @type {String}
 				*/
-				searchRootUrl: {
+				searchFieldName: {
 					type: String,
-					observer: '_onSearchRootUrlChanged'
+					value: 'query'
 				},
-
 				/*
-				* Value to send for the `sortField` parameter in the search query
-				* @type {String}
+				* Set to true if keypresses in the search box should refresh search results - otherwise, results are refreshed on ENTER
+				* @type {Boolean}
 				*/
-				sortField: String,
-
+				liveSearch: Boolean,
 				/*
-				* Array of parent organization IDs by which to limit the search results
-				* @type {String}
-				*/
-				parentOrganizationIds: {
-					type: Array,
-					value: function() {
-						return [];
-					}
-				},
-
-				/*
- 				* Outstanding /organizations XHRs, which are cancelled when a new search starts
- 				* @type {Array}
-				*/
-				_organizationRequests: {
-					type: Array,
-					value: function() {
-						return [];
-					}
-				},
-
-				/*
-				* The search string updated by the course search input
-				* @type {String}
-				*/
-				_searchString: {
-					type: String,
-					value: function() {
-						return '';
-					},
-					observer: '_onSearchStringChanged'
-				},
-
-				/*
-				* An array of objects containing the results of the search-my-enrollments action
+				* An array of objects containing the results of the search Action
 				* @type {Array<Object>}
 				*/
 				_searchResults: {
@@ -244,11 +202,18 @@
 						return [];
 					}
 				},
-
-				_searchUrl: String,
-
 				/*
-				* List of strings containing previously searched terms/selected courses
+				* Actual URL called for the search, generated from searchAction/FieldName
+				* @type {String}
+				*/
+				_searchUrl: String,
+				_searchString: {
+					type: String,
+					value: '',
+					observer: '_onSearchStringChanged'
+				},
+				/*
+				* List of strings containing previously searched terms
 				* @type {Array<String>}
 				*/
 				_previousSearches: {
@@ -258,21 +223,17 @@
 					}
 				}
 			},
-
 			listeners: {
 				'iron-select': '_onIronSelect'
 			},
-
 			behaviors: [
-				Polymer.D2L.MyCourses.LocalizeBehavior,
-				Polymer.D2L.MyCourses.UtilityBehavior
+				Polymer.D2L.SearchWidget.LocalizeBehavior,
+				Polymer.D2L.SearchWidget.UtilityBehavior
 			],
-
 			ready: function() {
 				this._handleFocusBound = this._handleFocus.bind(this);
 				this._handleClickBound = this._handleClick.bind(this);
 			},
-
 			attached: function() {
 				var i = 0;
 				var searchBarElements = this.$$('.search-bar').children;
@@ -292,7 +253,6 @@
 
 				this._initializePreviousSearches();
 			},
-
 			detached: function() {
 				var searchBarElements = this.$$('.search-bar').children;
 				for (var i = 0; i < searchBarElements.length; i++) {
@@ -302,104 +262,68 @@
 				document.body.removeEventListener('focus', this._handleFocusBound, true);
 				document.body.removeEventListener('click', this._handleClickBound, true);
 			},
-
 			/*
 			* Retrieves previous searches from local storage to populate listbox
 			*/
 			_initializePreviousSearches: function() {
-				if (window.localStorage.getItem('myCourses.previousSearches')) {
+				if (window.localStorage.getItem('searchWidget.previousSearches')) {
 					try {
-						var prevSearchObject = JSON.parse(window.localStorage.getItem('myCourses.previousSearches'));
+						var prevSearchObject = JSON.parse(window.localStorage.getItem('searchWidget.previousSearches'));
 
 						if (prevSearchObject.hasOwnProperty('searches') && prevSearchObject.searches instanceof Array) {
 							this._previousSearches = prevSearchObject.searches;
 						}
 					} catch (exception) {
-						window.localStorage.removeItem('myCourses.previousSearches');
+						window.localStorage.removeItem('searchWidget.previousSearches');
 						this._previousSearches = [];
 					}
 				}
 			},
-
-			/*
-			* Calls the search-my-enrollments action, used to populate live search results in the listbox
-			*/
-			_liveSearch: function() {
-				if (this._searchString) {
-					this.cancelDebouncer('liveSearchJob');
-
-					var queryParams = {
-						search: this._searchString,
-						page: 1,
-						pageSize: 5,
-						parentOrganizationIds: this.parentOrganizationIds.join(','),
-						sortField: this.sortField
-					};
-
-					this._searchUrl = this.createActionUrl(
-						this._searchAction,
-						queryParams
-					);
-
-					this._organizationRequests.forEach(function(req) {
-						if (req.abort) {
-							req.abort();
-						}
-					});
-					this.set('_organizationRequests', []);
-
-					this.$.searchRequest.generateRequest();
-				}
-			},
-
-			/*
-			* Submits an advanced search request
-			*/
-			_advancedSearch: function(searchString) {
-				if (searchString) {
-					var queryString = this._advancedSearchUrl + searchString;
-					this._addSearchToHistory(searchString);
-					window.location.href = queryString;
-				}
-			},
-
-			_onSearchButtonClick: function() {
-				this._advancedSearch(this._searchString);
-			},
-
 			_clearSearchResults: function() {
 				this.cancelDebouncer('liveSearchJob');
 				this.$$('iron-pages').select('recent-searches-page');
 				this._searchString = '';
 				this.set('_searchResults', []);
 			},
-
-			_onSearchStringChanged: function(newString) {
-				if (this._listboxes) {
-					if (newString.length > 0) {
-						if (!this.isDebouncerActive('liveSearchJob')) {
-							this.debounce('liveSearchJob', this._liveSearch.bind(this), 250);
-						}
-					} else {
-						this._clearSearchResults();
-					}
-				}
+			_onSearchActionChanged: function(searchAction) {
+				// Siren parser can only parse entities, so make a fake one with the given action
+				var entity = {
+					actions: [ searchAction ]
+				};
+				var parser = document.createElement('d2l-siren-parser');
+				this._searchAction = parser.parse(entity).actions[0];
 			},
+			_onSearchButtonClick: function() {
+				if (!this._searchAction) {
+					return;
+				}
 
+				var query = {};
+				query[this.searchFieldName] = this._searchString;
+
+				this._searchUrl = this.createActionUrl(this._searchAction, query);
+				this.$.searchRequest.generateRequest();
+			},
 			_onSearchInputKeyPressed: function(e) {
+				var keyCodes = {
+					DOWN: 40,
+					UP: 38,
+					ENTER: 13
+				};
+
 				switch (e.keyCode) {
-					case this._keyCodes.ENTER:
-						this._advancedSearch(this._searchString);
+					case keyCodes.ENTER:
+						this.$.searchRequest.generateRequest();
 						break;
 
-					case this._keyCodes.DOWN:
+					case keyCodes.DOWN:
 						if (this._currentListbox.hasItems()) {
 							this._currentListbox.focus();
 						}
 						e.preventDefault();
 						break;
 
-					case this._keyCodes.UP:
+					case keyCodes.UP:
 						if (this._currentListbox.hasItems()) {
 							this._currentListbox.focusLast();
 						}
@@ -407,7 +331,32 @@
 						break;
 				}
 			},
+			_onSearchStringChanged: function(newString) {
+				if (!this.liveSearch) {
+					// If live search isn't enabled, we don't do anything on a text change
+					return;
+				}
 
+				if (newString.length > 0) {
+					this.debounce('liveSearchJob', function() {
+						this.cancelDebouncer('liveSearchJob');
+
+						// Live searching is like mashing Enter between each debounced keypress
+						this._onSearchButtonClick();
+					}.bind(this), 250);
+				} else {
+					this._clearSearchResults();
+				}
+			},
+			_onSearchResponse: function(response) {
+				if (response.detail.status === 200) {
+					var parser = document.createElement('d2l-siren-parser');
+					var searchResponse = parser.parse(response.detail.xhr.response);
+					this._searchResults = searchResponse.entities;
+
+					this.$$('iron-pages').select(this._searchResults.length > 0 ? 'search-results-page' : 'no-results-page');
+				}
+			},
 			/*
 			 * Adds a search term to the list of recent searches.
 			 * @param {String} Search string
@@ -428,7 +377,7 @@
 
 				try {
 					window.localStorage.setItem(
-						'myCourses.previousSearches',
+						'searchWidget.previousSearches',
 						JSON.stringify({
 							searches: previousSearches
 						})
@@ -437,65 +386,6 @@
 					// Local storage not available/full - oh well.
 				}
 			},
-
-			/*
-			 * Creates a search URL from a previous search term
-			 * @param {String} Search string
-			 */
-			_computePreviousSearchLink: function(searchTerm) {
-				return this._advancedSearchUrl + searchTerm;
-			},
-
-			_onSearchRootUrlChanged: function(url) {
-				if (url) {
-					this.$.searchRootRequest.generateRequest();
-				}
-			},
-
-			_onSearchRootResponse: function(response) {
-				if (response.detail.status === 200) {
-					var parser = document.createElement('d2l-siren-parser');
-					var searchRootResponse = parser.parse(response.detail.xhr.response);
-
-					this._searchAction = searchRootResponse.getActionByName('search-my-enrollments');
-				}
-			},
-
-			/*
-			* Called when search-my-enrollments response received
-			* @param {Object}
-			*/
-			_onSearchResponse: function(response) {
-				if (response.detail.status === 200 && this._searchString) {
-					var parser = document.createElement('d2l-siren-parser');
-					var searchResponse = parser.parse(response.detail.xhr.response);
-					var enrollmentEntities = searchResponse.entities;
-
-					this.$$('iron-pages').select(enrollmentEntities.length > 0 ? 'search-results-page' : 'no-results-page');
-
-					this._searchResults = [];
-					for (var i = 0; i < enrollmentEntities.length; i++) {
-						// Fetch each search result's organization's information
-						(function(enrollment, self, parser) {
-							var ajax = document.createElement('d2l-ajax');
-							ajax.url = enrollment.getLinkByRel(/\/organization$/).href;
-							ajax.method = 'GET';
-							ajax.onResponse = function(response) {
-								if (response.detail.status === 200 || response.detail.status === 304) {
-									var organization = parser.parse(response.detail.response);
-									self.push('_searchResults', {
-										name: organization.properties.name,
-										href: organization.getLinkByRel(/\/organization-homepage$/).href
-									});
-								}
-							};
-							ajax.generateRequest();
-							self.push('_organizationRequests', ajax);
-						})(enrollmentEntities[i], this, parser);
-					}
-				}
-			},
-
 			/*
 			* Handles iron-select events, which are fired when listbox items are selected and dropdown pages are changed
 			*/
@@ -520,19 +410,6 @@
 						break;
 				}
 			},
-
-			_keyCodes: {
-				DOWN: 40,
-				UP: 38,
-				ENTER: 13
-			},
-
-			/*
-			* URL for advanced search functionality (existing advanced search page from legacy My Courses widget).
-			* @type {String}
-			*/
-			_advancedSearchUrl: 'le/manageCourses/search/6606?searchTerm=',
-
 			/*
 			 * Called when an element within the search bar gains focus, to open the dropdown.
 			 */
@@ -541,21 +418,18 @@
 					this.$.dropdown.open();
 				}
 			},
-
 			/*
 			 * Handles loss of focus of this element due to focus event.
 			 */
 			_handleFocus: function() {
 				this._checkFocusLost(document.activeElement);
 			},
-
 			/*
 			 * Handles loss of focus of this element due to click event.
 			 */
 			_handleClick: function(e) {
 				this._checkFocusLost(Polymer.dom(e).rootTarget);
 			},
-
 			/*
 			* Determines whether the widget has lost focus, and closes the dropdown if it has.
 			*/
@@ -564,7 +438,6 @@
 					this.$.dropdown.close();
 				}
 			},
-
 			/*
 			 * Determines whether the given element is a descendant of this element.
 			 */

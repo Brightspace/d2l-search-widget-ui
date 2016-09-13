@@ -29,6 +29,7 @@
     "polymer": "^1.6.1"
   },
   "dependencies": {
-    "iron-component-page": "^1.1.7"
+    "iron-component-page": "^1.1.7",
+    "d2l-icons": "^2.7.0"
   }
 }

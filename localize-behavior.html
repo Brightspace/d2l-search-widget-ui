@@ -5,14 +5,14 @@
 
 	(function() {
 		Polymer.D2L = Polymer.D2L || {};
-		Polymer.D2L.MyCourses = Polymer.D2L.MyCourses || {};
+		Polymer.D2L.SearchWidget = Polymer.D2L.SearchWidget || {};
 
 		/*
 		* Behavior for elements that require localization, based on `app-localize-behavior`
 		*
-		* @polymerBehavior Polymer.D2L.MyCourses.LocalizeBehavior
+		* @polymerBehavior Polymer.D2L.SearchWidget.LocalizeBehavior
 		*/
-		Polymer.D2L.MyCourses.LocalizeBehaviorImpl = {
+		Polymer.D2L.SearchWidget.LocalizeBehaviorImpl = {
 			properties: {
 				/*
 				* Language string
@@ -41,45 +41,11 @@
 				resources: {
 					value: function() {
 						var en = {
-							'viewAllCourses' : 'View All Courses',
-							'allCourses' : 'All Courses',
 							'pinnedCourses' : 'Pinned',
 							'unpinnedCourses' : 'Unpinned',
-							'closeSimpleOverlayAltText' : 'Close Dialog',
-							'pin': 'Pin',
-							'pinActionResult': '{course} has been pinned',
-							'unpin': 'Unpin',
-							'unpinActionResult': '{course} has been unpinned',
-							'noCoursesMessage': 'Your courses aren\'t quite ready. Please check back soon.',
-							'noPinnedCoursesMessage': 'You don\'t have any pinned courses. Pin your favorite courses to make them easier to find.',
-							'noUnpinnedCoursesMessage': 'Nothing to see here! All of your courses are pinned.',
-							'refresh': 'Refresh',
 							'noSearchResults': 'No results.',
 							'courseSearchInputPlaceholder': 'Find a course',
-							'recentSearches': 'Recent Searches',
-							'changeImage': 'Change Image',
-							'useThisImage': 'Use this image',
-							'courseSettings': '{course} course settings',
-							'filtering.filter': 'Filter',
-							'filtering.filterBy': 'Filter By',
-							'filtering.filterSingle': 'Filter: 1 Filter',
-							'filtering.filterMultiple': 'Filter: {num} Filters',
-							'filtering.clear': 'Clear',
-							'filtering.semester': 'Semester',
-							'filtering.department': 'Department',
-							'filtering.semesterMultiple': 'Semester ({num})',
-							'filtering.departmentMultiple': 'Semester ({num})',
-							'sorting.sortCourseCode': 'Sort: Course Code',
-							'sorting.sortCourseName': 'Sort: Course Name',
-							'sorting.sortDatePinned': 'Sort: Date Pinned',
-							'sorting.sortDepartment': 'Sort: Department',
-							'sorting.sortLastAccessed': 'Sort: Last Accessed',
-							'sorting.sortBy': 'Sort By',
-							'sorting.courseCode': 'Course Code',
-							'sorting.courseName': 'Course Name',
-							'sorting.datePinned': 'Date Pinned',
-							'sorting.department': 'Department',
-							'sorting.lastAccessed': 'Last Accessed'
+							'recentSearches': 'Recent Searches'
 						};
 
 						return {
@@ -106,9 +72,9 @@
 		};
 
 		/* @polymerBehavior */
-		Polymer.D2L.MyCourses.LocalizeBehavior = [
+		Polymer.D2L.SearchWidget.LocalizeBehavior = [
 			Polymer.AppLocalizeBehavior,
-			Polymer.D2L.MyCourses.LocalizeBehaviorImpl
+			Polymer.D2L.SearchWidget.LocalizeBehaviorImpl
 		];
 	})();
 </script>
