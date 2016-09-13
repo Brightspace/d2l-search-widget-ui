@@ -1,0 +1,114 @@
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+
+<script>
+	'use strict';
+
+	(function() {
+		Polymer.D2L = Polymer.D2L || {};
+		Polymer.D2L.MyCourses = Polymer.D2L.MyCourses || {};
+
+		/*
+		* Behavior for elements that require localization, based on `app-localize-behavior`
+		*
+		* @polymerBehavior Polymer.D2L.MyCourses.LocalizeBehavior
+		*/
+		Polymer.D2L.MyCourses.LocalizeBehaviorImpl = {
+			properties: {
+				/*
+				* Language string
+				* @type {String}
+				*/
+				language: {
+					type: String,
+					computed: '_determineLanguage(locale, resources)'
+				},
+				/*
+				* Locale string
+				* @type {String}
+				*/
+				locale: {
+					type: String,
+					value: function() {
+						return document.documentElement.lang
+							|| document.documentElement.getAttribute('data-lang-default')
+							|| 'en-us';
+					}
+				},
+				/*
+				* Translation resources
+				* @type {Object}
+				*/
+				resources: {
+					value: function() {
+						var en = {
+							'viewAllCourses' : 'View All Courses',
+							'allCourses' : 'All Courses',
+							'pinnedCourses' : 'Pinned',
+							'unpinnedCourses' : 'Unpinned',
+							'closeSimpleOverlayAltText' : 'Close Dialog',
+							'pin': 'Pin',
+							'pinActionResult': '{course} has been pinned',
+							'unpin': 'Unpin',
+							'unpinActionResult': '{course} has been unpinned',
+							'noCoursesMessage': 'Your courses aren\'t quite ready. Please check back soon.',
+							'noPinnedCoursesMessage': 'You don\'t have any pinned courses. Pin your favorite courses to make them easier to find.',
+							'noUnpinnedCoursesMessage': 'Nothing to see here! All of your courses are pinned.',
+							'refresh': 'Refresh',
+							'noSearchResults': 'No results.',
+							'courseSearchInputPlaceholder': 'Find a course',
+							'recentSearches': 'Recent Searches',
+							'changeImage': 'Change Image',
+							'useThisImage': 'Use this image',
+							'courseSettings': '{course} course settings',
+							'filtering.filter': 'Filter',
+							'filtering.filterBy': 'Filter By',
+							'filtering.filterSingle': 'Filter: 1 Filter',
+							'filtering.filterMultiple': 'Filter: {num} Filters',
+							'filtering.clear': 'Clear',
+							'filtering.semester': 'Semester',
+							'filtering.department': 'Department',
+							'filtering.semesterMultiple': 'Semester ({num})',
+							'filtering.departmentMultiple': 'Semester ({num})',
+							'sorting.sortCourseCode': 'Sort: Course Code',
+							'sorting.sortCourseName': 'Sort: Course Name',
+							'sorting.sortDatePinned': 'Sort: Date Pinned',
+							'sorting.sortDepartment': 'Sort: Department',
+							'sorting.sortLastAccessed': 'Sort: Last Accessed',
+							'sorting.sortBy': 'Sort By',
+							'sorting.courseCode': 'Course Code',
+							'sorting.courseName': 'Course Name',
+							'sorting.datePinned': 'Date Pinned',
+							'sorting.department': 'Department',
+							'sorting.lastAccessed': 'Last Accessed'
+						};
+
+						return {
+							'en': en
+						};
+					}
+				}
+			},
+			_determineLanguage: function(locale, resources) {
+				locale = locale.toLowerCase();
+
+				if (resources[locale]) {
+					return locale;
+				}
+
+				var langAndRegion = locale.split('-');
+
+				if (resources[langAndRegion[0]]) {
+					return langAndRegion[0];
+				}
+
+				return 'en';
+			}
+		};
+
+		/* @polymerBehavior */
+		Polymer.D2L.MyCourses.LocalizeBehavior = [
+			Polymer.AppLocalizeBehavior,
+			Polymer.D2L.MyCourses.LocalizeBehaviorImpl
+		];
+	})();
+</script>

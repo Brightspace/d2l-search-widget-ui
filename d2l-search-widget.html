@@ -1,0 +1,578 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../d2l-ajax/d2l-ajax.html">
+<link rel="import" href="../d2l-dropdown/d2l-dropdown.html">
+<link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
+<link rel="import" href="../d2l-typography/d2l-typography-shared-styles.html">
+<link rel="import" href="localize-behavior.html">
+<link rel="import" href="d2l-search-listbox.html">
+<link rel="import" href="d2l-utility-behavior.html">
+<link rel="import" href="d2l-search-dropdown-content.html">
+
+<dom-module id="d2l-search-widget">
+	<template>
+		<style>
+			:host {
+				position: relative;
+				display: block;
+				min-width: 100px;
+				min-height: 60px;
+				padding: 0;
+				margin: 0;
+			}
+
+			input {
+				width: 100%;
+				height: 60px;
+				background-color: var(--d2l-color-white);
+				border-color: var(--d2l-color-titanius);
+				border-width: 1px;
+				box-shadow: inset 0 2px 0 0 rgba(185,194,208,.2);
+				padding: .4rem 1rem;
+				border-radius: .3rem;
+				border-style: solid;
+				vertical-align: middle;
+				font-size: 1rem;
+				font-weight: 300;
+				letter-spacing: .015rem;
+				font-family: inherit;
+				box-sizing: border-box;
+				-webkit-transition-duration: .5s;
+				transition-duration: .5s;
+				-webkit-transition-timing-function: ease;
+				transition-timing-function: ease;
+				-webkit-transition-property: background-color,border-color;
+				transition-property: background-color,border-color;
+				padding-left: 65px;
+				padding-right: 65px;
+			}
+
+			input:focus,
+			input:hover {
+				border-color: var(--d2l-color-celestine);
+				border-width: 2px;
+				outline-width: 0;
+				padding: -webkit-calc(.4rem - 1px) -webkit-calc(1rem - 1px);
+				padding: calc(.4rem - 1px) calc(1rem - 1px);
+				padding-left: 64px;
+				padding-right: 64px;
+			}
+
+			.dropdown-content {
+				background: transparent;
+			}
+
+			d2l-dropdown {
+				min-width: 100%;
+			}
+
+			d2l-search-listbox {
+				border-radius: 6px;
+			}
+
+			.search-icon {
+				position: absolute;
+				top: 0px;
+				padding: 15px;
+				background: none;
+				border: none;
+				margin: 0;
+				cursor: pointer;
+				opacity: 0.7;
+			}
+			.search-icon:focus,
+			.search-icon:hover {
+				opacity: 1.0;
+			}
+			.search-icon iron-icon {
+				width: 30px;
+				height: 30px;
+				color: var(--d2l-color-tungsten);
+			}
+
+			.search-button {
+				left: 5px;
+			}
+
+			.clear-search-button {
+				right: 5px;
+			}
+		</style>
+
+		<d2l-ajax
+			id="searchRootRequest"
+			url="[[searchRootUrl]]"
+			headers='{ "Accept": "application/vnd.siren+json" }'
+			on-iron-ajax-response="_onSearchRootResponse">
+		</d2l-ajax>
+
+		<d2l-ajax
+			id="searchRequest"
+			url="[[_searchUrl]]"
+			headers='{ "Accept": "application/vnd.siren+json" }'
+			on-iron-ajax-response="_onSearchResponse">
+		</d2l-ajax>
+
+		<d2l-dropdown no-auto-open>
+			<div class="search-bar d2l-dropdown-opener" id="opener">
+				<button type="button" on-tap="_onSearchButtonClick" class="search-icon search-button">
+					<iron-icon icon="d2l-tier1:search"></iron-icon>
+				</button>
+
+				<input
+					is="iron-input"
+					bind-value="{{_searchString}}"
+					role="combobox"
+					aria-autocomplete="list"
+					placeholder="{{localize('courseSearchInputPlaceholder')}}"
+					on-keydown="_onSearchInputKeyPressed">
+				</input>
+
+				<button type="button" on-tap="_clearSearchResults" class="search-icon clear-search-button">
+					<iron-icon icon="d2l-tier1:close-default"></iron-icon>
+				</button>
+			</div>
+			<d2l-search-dropdown-content
+				id="dropdown"
+				no-pointer
+				no-auto-close
+				no-auto-focus
+				no-padding>
+
+				<div class="dropdown-content">
+					<iron-pages selectable=".search-results-listbox-page" attr-for-selected="data-page-name" selected="recent-searches-page">
+						<div class="search-results-listbox-page" data-page-name="recent-searches-page">
+							<d2l-search-listbox>
+								<div class="d2l-heading-4" data-list-title disabled>{{localize('recentSearches')}}</div>
+								<template is="dom-repeat" items="[[_previousSearches]]">
+									<div selectable data-text$="[[item]]" data-href$="[[_computePreviousSearchLink(item)]]" role="option">
+										[[item]]
+									</div>
+								</template>
+							</d2l-search-listbox>
+						</div>
+
+						<div class="search-results-listbox-page" data-page-name="search-results-page">
+							<d2l-search-listbox>
+								<template id="courseSearchResultsTemplate" is="dom-repeat" items="[[_searchResults]]">
+									<div selectable data-text$="[[item.name]]" data-href$="[[item.href]]" role="option">
+										[[item.name]]
+									</div>
+								</template>
+							</d2l-search-listbox>
+						</div>
+
+						<div class="search-results-listbox-page" data-page-name="no-results-page">
+							<d2l-search-listbox>
+								<div disabled>{{localize('noSearchResults')}}</div>
+							</d2l-search-listbox>
+						</div>
+					</iron-pages>
+				</div>
+			</d2l-search-dropdown-content>
+		</d2l-dropdown>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'd2l-search-widget',
+
+			properties: {
+				/*
+				* Root search URL, which should have the search Action in the response
+				* @type {String}
+				*/
+				searchRootUrl: {
+					type: String,
+					observer: '_onSearchRootUrlChanged'
+				},
+
+				/*
+				* Value to send for the `sortField` parameter in the search query
+				* @type {String}
+				*/
+				sortField: String,
+
+				/*
+				* Array of parent organization IDs by which to limit the search results
+				* @type {String}
+				*/
+				parentOrganizationIds: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+
+				/*
+ 				* Outstanding /organizations XHRs, which are cancelled when a new search starts
+ 				* @type {Array}
+				*/
+				_organizationRequests: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+
+				/*
+				* The search string updated by the course search input
+				* @type {String}
+				*/
+				_searchString: {
+					type: String,
+					value: function() {
+						return '';
+					},
+					observer: '_onSearchStringChanged'
+				},
+
+				/*
+				* An array of objects containing the results of the search-my-enrollments action
+				* @type {Array<Object>}
+				*/
+				_searchResults: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+
+				_searchUrl: String,
+
+				/*
+				* List of strings containing previously searched terms/selected courses
+				* @type {Array<String>}
+				*/
+				_previousSearches: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				}
+			},
+
+			listeners: {
+				'iron-select': '_onIronSelect'
+			},
+
+			behaviors: [
+				Polymer.D2L.MyCourses.LocalizeBehavior,
+				Polymer.D2L.MyCourses.UtilityBehavior
+			],
+
+			ready: function() {
+				this._handleFocusBound = this._handleFocus.bind(this);
+				this._handleClickBound = this._handleClick.bind(this);
+			},
+
+			attached: function() {
+				var i = 0;
+				var searchBarElements = this.$$('.search-bar').children;
+
+				for (i = 0; i < searchBarElements.length; i++) {
+					this.listen(searchBarElements[i], 'focus', '_onElementFocus');
+				}
+
+				document.body.addEventListener('focus', this._handleFocusBound, true);
+				document.body.addEventListener('click', this._handleClickBound, true);
+
+				this._listboxes = Polymer.dom(this.root).querySelectorAll('d2l-search-listbox').slice();
+
+				for (i = 0; i < this._listboxes.length; i++) {
+					this._listboxes[i].owner = this.$$('input');
+				}
+
+				this._initializePreviousSearches();
+			},
+
+			detached: function() {
+				var searchBarElements = this.$$('.search-bar').children;
+				for (var i = 0; i < searchBarElements.length; i++) {
+					this.unlisten(searchBarElements[i], 'focus', '_onElementFocus');
+				}
+
+				document.body.removeEventListener('focus', this._handleFocusBound, true);
+				document.body.removeEventListener('click', this._handleClickBound, true);
+			},
+
+			/*
+			* Retrieves previous searches from local storage to populate listbox
+			*/
+			_initializePreviousSearches: function() {
+				if (window.localStorage.getItem('myCourses.previousSearches')) {
+					try {
+						var prevSearchObject = JSON.parse(window.localStorage.getItem('myCourses.previousSearches'));
+
+						if (prevSearchObject.hasOwnProperty('searches') && prevSearchObject.searches instanceof Array) {
+							this._previousSearches = prevSearchObject.searches;
+						}
+					} catch (exception) {
+						window.localStorage.removeItem('myCourses.previousSearches');
+						this._previousSearches = [];
+					}
+				}
+			},
+
+			/*
+			* Calls the search-my-enrollments action, used to populate live search results in the listbox
+			*/
+			_liveSearch: function() {
+				if (this._searchString) {
+					this.cancelDebouncer('liveSearchJob');
+
+					var queryParams = {
+						search: this._searchString,
+						page: 1,
+						pageSize: 5,
+						parentOrganizationIds: this.parentOrganizationIds.join(','),
+						sortField: this.sortField
+					};
+
+					this._searchUrl = this.createActionUrl(
+						this._searchAction,
+						queryParams
+					);
+
+					this._organizationRequests.forEach(function(req) {
+						if (req.abort) {
+							req.abort();
+						}
+					});
+					this.set('_organizationRequests', []);
+
+					this.$.searchRequest.generateRequest();
+				}
+			},
+
+			/*
+			* Submits an advanced search request
+			*/
+			_advancedSearch: function(searchString) {
+				if (searchString) {
+					var queryString = this._advancedSearchUrl + searchString;
+					this._addSearchToHistory(searchString);
+					window.location.href = queryString;
+				}
+			},
+
+			_onSearchButtonClick: function() {
+				this._advancedSearch(this._searchString);
+			},
+
+			_clearSearchResults: function() {
+				this.cancelDebouncer('liveSearchJob');
+				this.$$('iron-pages').select('recent-searches-page');
+				this._searchString = '';
+				this.set('_searchResults', []);
+			},
+
+			_onSearchStringChanged: function(newString) {
+				if (this._listboxes) {
+					if (newString.length > 0) {
+						if (!this.isDebouncerActive('liveSearchJob')) {
+							this.debounce('liveSearchJob', this._liveSearch.bind(this), 250);
+						}
+					} else {
+						this._clearSearchResults();
+					}
+				}
+			},
+
+			_onSearchInputKeyPressed: function(e) {
+				switch (e.keyCode) {
+					case this._keyCodes.ENTER:
+						this._advancedSearch(this._searchString);
+						break;
+
+					case this._keyCodes.DOWN:
+						if (this._currentListbox.hasItems()) {
+							this._currentListbox.focus();
+						}
+						e.preventDefault();
+						break;
+
+					case this._keyCodes.UP:
+						if (this._currentListbox.hasItems()) {
+							this._currentListbox.focusLast();
+						}
+						e.preventDefault();
+						break;
+				}
+			},
+
+			/*
+			 * Adds a search term to the list of recent searches.
+			 * @param {String} Search string
+			 */
+			_addSearchToHistory: function(searchTerm) {
+				var previousSearches = this._previousSearches.slice();
+
+				// Remove prior existence of this search term if it exists
+				var currSearchHistoryIndex = previousSearches.indexOf(searchTerm);
+
+				if (currSearchHistoryIndex !== -1) {
+					previousSearches.splice(currSearchHistoryIndex, 1);
+				}
+
+				if (previousSearches.unshift(searchTerm) > 5) {
+					previousSearches.splice(previousSearches.length - 1, 1);
+				}
+
+				try {
+					window.localStorage.setItem(
+						'myCourses.previousSearches',
+						JSON.stringify({
+							searches: previousSearches
+						})
+					);
+				} catch (e) {
+					// Local storage not available/full - oh well.
+				}
+			},
+
+			/*
+			 * Creates a search URL from a previous search term
+			 * @param {String} Search string
+			 */
+			_computePreviousSearchLink: function(searchTerm) {
+				return this._advancedSearchUrl + searchTerm;
+			},
+
+			_onSearchRootUrlChanged: function(url) {
+				if (url) {
+					this.$.searchRootRequest.generateRequest();
+				}
+			},
+
+			_onSearchRootResponse: function(response) {
+				if (response.detail.status === 200) {
+					var parser = document.createElement('d2l-siren-parser');
+					var searchRootResponse = parser.parse(response.detail.xhr.response);
+
+					this._searchAction = searchRootResponse.getActionByName('search-my-enrollments');
+				}
+			},
+
+			/*
+			* Called when search-my-enrollments response received
+			* @param {Object}
+			*/
+			_onSearchResponse: function(response) {
+				if (response.detail.status === 200 && this._searchString) {
+					var parser = document.createElement('d2l-siren-parser');
+					var searchResponse = parser.parse(response.detail.xhr.response);
+					var enrollmentEntities = searchResponse.entities;
+
+					this.$$('iron-pages').select(enrollmentEntities.length > 0 ? 'search-results-page' : 'no-results-page');
+
+					this._searchResults = [];
+					for (var i = 0; i < enrollmentEntities.length; i++) {
+						// Fetch each search result's organization's information
+						(function(enrollment, self, parser) {
+							var ajax = document.createElement('d2l-ajax');
+							ajax.url = enrollment.getLinkByRel(/\/organization$/).href;
+							ajax.method = 'GET';
+							ajax.onResponse = function(response) {
+								if (response.detail.status === 200 || response.detail.status === 304) {
+									var organization = parser.parse(response.detail.response);
+									self.push('_searchResults', {
+										name: organization.properties.name,
+										href: organization.getLinkByRel(/\/organization-homepage$/).href
+									});
+								}
+							};
+							ajax.generateRequest();
+							self.push('_organizationRequests', ajax);
+						})(enrollmentEntities[i], this, parser);
+					}
+				}
+			},
+
+			/*
+			* Handles iron-select events, which are fired when listbox items are selected and dropdown pages are changed
+			*/
+			_onIronSelect: function(e) {
+				switch (e.target.nodeName) {
+					case 'IRON-PAGES':
+						// @TODO: Not a fan of any of this "current listbox" handling - necessary right now due to Iron Behavior regressions.
+						// Should find a better way.
+						var ironPages = this.$$('iron-pages');
+						var pageIndex = ironPages.indexOf(ironPages.selectedItem);
+						this._currentListbox = this._listboxes[pageIndex];
+						break;
+
+					case 'D2L-SEARCH-LISTBOX':
+						if (e.detail.item.dataset.href) {
+							if (e.detail.item.dataset.text) {
+								this._addSearchToHistory(e.detail.item.dataset.text);
+							}
+
+							window.location.href = e.detail.item.dataset.href;
+						}
+						break;
+				}
+			},
+
+			_keyCodes: {
+				DOWN: 40,
+				UP: 38,
+				ENTER: 13
+			},
+
+			/*
+			* URL for advanced search functionality (existing advanced search page from legacy My Courses widget).
+			* @type {String}
+			*/
+			_advancedSearchUrl: 'le/manageCourses/search/6606?searchTerm=',
+
+			/*
+			 * Called when an element within the search bar gains focus, to open the dropdown.
+			 */
+			_onElementFocus: function() {
+				if (!this.$.dropdown.opened) {
+					this.$.dropdown.open();
+				}
+			},
+
+			/*
+			 * Handles loss of focus of this element due to focus event.
+			 */
+			_handleFocus: function() {
+				this._checkFocusLost(document.activeElement);
+			},
+
+			/*
+			 * Handles loss of focus of this element due to click event.
+			 */
+			_handleClick: function(e) {
+				this._checkFocusLost(Polymer.dom(e).rootTarget);
+			},
+
+			/*
+			* Determines whether the widget has lost focus, and closes the dropdown if it has.
+			*/
+			_checkFocusLost: function(focusedElement) {
+				if (this.$.dropdown.opened && !this._isDescendant(focusedElement)) {
+					this.$.dropdown.close();
+				}
+			},
+
+			/*
+			 * Determines whether the given element is a descendant of this element.
+			 */
+			_isDescendant: function(element) {
+				var parentNode = element.parentNode;
+				while (parentNode) {
+					if (Polymer.dom(parentNode).node === this) {
+						return true;
+					}
+					parentNode = parentNode.parentNode;
+				}
+				return false;
+			}
+		});
+	</script>
+</dom-module>

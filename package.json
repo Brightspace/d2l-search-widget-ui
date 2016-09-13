@@ -1,0 +1,26 @@
+{
+  "name": "d2l-search-widget",
+  "private": true,
+  "scripts": {
+    "prebuild": "rimraf dist && mkdir dist",
+    "build": "cp d2l-*.html ./dist/",
+    "postinstall": "bower install",
+    "serve": "polymer serve",
+    "test": "npm run test:lint:js && wct",
+    "test:lint:js": "eslint test/ --ext .js,.html && eslint *.html",
+    "test:lint:wc": "polylint",
+    "test:no-lint": "wct -p"
+  },
+  "author": "D2L Corporation",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "bower": "^1.7.9",
+    "eslint": "^3.5.0",
+    "eslint-config-brightspace": "^0.2.1",
+    "eslint-plugin-html": "^1.5.2",
+    "polylint": "^2.10.1",
+    "polymer-cli": "^0.16.0",
+    "rimraf": "^2.5.4",
+    "web-component-tester": "^4.3.4"
+  }
+}
