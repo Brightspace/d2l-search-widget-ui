@@ -4,10 +4,9 @@
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../d2l-ajax/d2l-ajax.html">
 <link rel="import" href="../d2l-dropdown/d2l-dropdown.html">
+<link rel="import" href="../d2l-colors/d2l-colors.html">
 <link rel="import" href="../d2l-icons/d2l-icons.html">
 <link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
-<link rel="import" href="../d2l-typography/d2l-typography-shared-styles.html">
-<link rel="import" href="localize-behavior.html">
 <link rel="import" href="d2l-utility-behavior.html">
 
 <!--
@@ -17,6 +16,7 @@
 -->
 <dom-module id="d2l-search-widget">
 	<template>
+		<style include="d2l-colors"></style>
 		<style>
 			:host {
 				position: relative;
@@ -69,15 +69,11 @@
 				border: none;
 				margin: 0;
 				cursor: pointer;
-				opacity: 0.7;
-			}
-			.search-icon:focus,
-			.search-icon:hover {
-				opacity: 1.0;
+				height: 100%;
 			}
 			.search-icon iron-icon {
-				width: 30px;
-				height: 30px;
+				width: 22px;
+				height: 22px;
 				color: var(--d2l-color-tungsten);
 			}
 			.search-button {
@@ -105,7 +101,7 @@
 				bind-value="{{_searchString}}"
 				role="combobox"
 				aria-autocomplete="list"
-				placeholder="{{localize('courseSearchInputPlaceholder')}}"
+				placeholder="{{placeholderText}}"
 				on-keydown="_onSearchInputKeyPressed">
 			</input>
 
@@ -131,6 +127,14 @@
 				* @event d2l-search-widget-results
 				*/
 
+				/*
+				* Placeholder text that appears in the search field
+				* @type {String}
+				*/
+				placeholderText: {
+					type: String,
+					value: ''
+				},
 				/*
 				* Hypermedia Entity that contains search Action
 				*/
@@ -167,7 +171,6 @@
 				}
 			},
 			behaviors: [
-				Polymer.D2L.SearchWidget.LocalizeBehavior,
 				Polymer.D2L.SearchWidget.UtilityBehavior
 			],
 			_clearSearchResults: function() {
@@ -185,6 +188,11 @@
 			},
 			_onSearchButtonClick: function() {
 				if (!this._searchAction) {
+					return;
+				}
+
+				if (this._searchString.length === 0) {
+					this._clearSearchResults();
 					return;
 				}
 
