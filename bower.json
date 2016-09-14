@@ -17,19 +17,14 @@
     "/demo/"
   ],
   "devDependencies": {
-    "app-localize-behavior": "^0.9.2",
-    "d2l-ajax": "^2.0.0",
-    "d2l-dropdown": "^2.2.2",
-    "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
-    "d2l-typography": "^4.1.0",
-    "iron-a11y-keys": "^1.0.6",
-    "iron-input": "^1.0.10",
-    "iron-menu-behavior": "^1.1.10",
-    "iron-pages": "^1.0.8",
-    "polymer": "^1.6.1"
+    "iron-component-page": "^1.1.7"
   },
   "dependencies": {
-    "iron-component-page": "^1.1.7",
-    "d2l-icons": "^2.7.0"
+    "d2l-ajax": "^2.0.0",
+    "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
+    "d2l-typography": "^4.1.0",
+    "d2l-icons": "^2.7.0",
+    "iron-input": "^1.0.10",
+    "polymer": "^1.6.1"
   }
 }
