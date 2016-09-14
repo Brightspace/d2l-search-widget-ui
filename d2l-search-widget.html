@@ -122,6 +122,16 @@
 
 			properties: {
 				/*
+				* Fired whenever the search results change
+				*
+				* This can either occur when a search request comes back with results, or
+				* when the search field is cleared by the user. The detail of the event is
+				* the search results, which can then be parsed in the handler.
+				*
+				* @event d2l-search-widget-results
+				*/
+
+				/*
 				* Hypermedia Entity that contains search Action
 				*/
 				searchAction: {
