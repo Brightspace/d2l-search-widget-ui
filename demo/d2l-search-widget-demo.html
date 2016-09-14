@@ -17,10 +17,23 @@
 		<main class="max-width">
 			<h1>d2l-search-widget demo</h1>
 			<d2l-search-widget
-				search-action='{"name":"search-my-enrollments","method":"GET","href":"/components/d2l-search-widget/demo/enrollmentsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"pageSize","type":"number","value":20},{"name":"embedDepth","type":"number","value":0},{"name":"sortField","type":"radio","value":""},{"name":"sortDescending","type":"checkbox","value":false},{"name":"parentOrganizationIds","type":"hidden","value":""}]}'
-				search-action-name="search-my-enrollments"
-				search-field-name="search"
-				live-search></d2l-search-widget>
+				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
+				search-field-name="search"></d2l-search-widget>
+
+			Result:
+			<ul id="result">
+			</ul>
+			<script>
+				document.addEventListener('d2l-search-widget-results', function(e) {
+					var ul = document.getElementById('result');
+					ul.innerHTML = '';
+					e.detail.forEach(function(entity) {
+						var li = document.createElement('li');
+						li.innerHTML = entity.properties.name;
+						ul.appendChild(li);
+					});
+				});
+			</script>
 		</main>
 	</body>
 </html>
