@@ -108,7 +108,7 @@
 				* when the search field is cleared by the user. The detail of the event is
 				* the search results, which can then be parsed in the handler.
 				*
-				* @event d2l-search-widget-results
+				* @event search-results-changed
 				*/
 
 				/*
@@ -138,8 +138,10 @@
 				* An array of objects containing the results of the search Action
 				* @type {Array<Object>}
 				*/
-				lastResults: {
+				searchResults: {
 					type: Array,
+					readOnly: true,
+					notify: true,
 					value: function() {
 						return [];
 					}
@@ -156,8 +158,7 @@
 			},
 			_clearSearchResults: function() {
 				this._searchString = '';
-				this.set('lastResults', []);
-				this.fire('d2l-search-widget-results', this.lastResults);
+				this._onSearchButtonClick();
 			},
 			/*
 			* Creates a URL with a query from an Action and an object of required parameters
@@ -196,11 +197,6 @@
 					return;
 				}
 
-				if (this._searchString.length === 0) {
-					this._clearSearchResults();
-					return;
-				}
-
 				var query = {};
 				query[this.searchFieldName] = this._searchString;
 
@@ -217,8 +213,7 @@
 				if (response.detail.status === 200 || response.detail.status === 304) {
 					var parser = document.createElement('d2l-siren-parser');
 					var searchResponse = parser.parse(response.detail.xhr.response);
-					this.set('lastResults', searchResponse.entities);
-					this.fire('d2l-search-widget-results', this.lastResults);
+					this._setSearchResults(searchResponse.entities || []);
 				}
 			}
 		});

@@ -25,10 +25,10 @@
 			<ul id="result">
 			</ul>
 			<script>
-				document.addEventListener('d2l-search-widget-results', function(e) {
+				document.querySelector('d2l-search-widget').addEventListener('search-results-changed', function(e) {
 					var ul = document.getElementById('result');
 					ul.innerHTML = '';
-					e.detail.forEach(function(entity) {
+					e.detail.value.forEach(function(entity) {
 						var li = document.createElement('li');
 						li.innerHTML = entity.properties.name;
 						ul.appendChild(li);
