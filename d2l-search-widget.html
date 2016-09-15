@@ -132,7 +132,7 @@
 				*/
 				searchFieldName: {
 					type: String,
-					value: 'query'
+					value: 'search'
 				},
 				/*
 				* An array of objects containing the results of the search Action
@@ -150,14 +150,18 @@
 				* Actual URL called for the search, generated from searchAction/FieldName
 				* @type {String}
 				*/
-				_searchUrl: String,
+				_searchUrl: {
+					type: String,
+					value: '',
+					observer: '_onSearchUrlChanged'
+				},
 				_searchString: {
 					type: String,
 					value: ''
 				}
 			},
 			_clearSearchResults: function() {
-				this._searchString = '';
+				this.set('_searchString', '');
 				this._onSearchButtonClick();
 			},
 			/*
@@ -190,7 +194,7 @@
 					actions: [ searchAction ]
 				};
 				var parser = document.createElement('d2l-siren-parser');
-				this._searchAction = parser.parse(entity).actions[0];
+				this.set('_searchAction', parser.parse(entity).actions[0]);
 			},
 			_onSearchButtonClick: function() {
 				if (!this._searchAction) {
@@ -200,8 +204,7 @@
 				var query = {};
 				query[this.searchFieldName] = this._searchString;
 
-				this._searchUrl = this._createActionUrl(this._searchAction, query);
-				this.$.searchRequest.generateRequest();
+				this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 			},
 			_onSearchInputKeyPressed: function(e) {
 				// If Enter key pressed, do the search
@@ -215,6 +218,10 @@
 					var searchResponse = parser.parse(response.detail.xhr.response);
 					this._setSearchResults(searchResponse.entities || []);
 				}
+			},
+			_onSearchUrlChanged: function() {
+				// Using an observer means trying the same query multiple times will only generate one request
+				this.$.searchRequest.generateRequest();
 			}
 		});
 	</script>
