@@ -195,6 +195,10 @@
 				return queryString ? action.href + '?' + queryString : action.href;
 			},
 			_onSearchActionChanged: function(searchAction) {
+				if ('string' === typeof searchAction) {
+					searchAction = JSON.parse(searchAction);
+				}
+
 				// Siren parser can only parse entities, so make a fake one with the given action
 				var entity = {
 					actions: [ searchAction ]
