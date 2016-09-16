@@ -164,7 +164,7 @@
 			* Trigger the search manually. Useful if search needs to be triggered automatically for whatever reason.
 			*/
 			search: function() {
-				this.$.searchRequest.generateRequest();
+				this._onSearchButtonClick();
 			},
 			_clearSearchResults: function() {
 				this.set('_searchString', '');

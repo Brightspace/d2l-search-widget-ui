@@ -15,8 +15,16 @@
 	</head>
 	<body unresolved>
 		<main class="max-width">
+			<script>
+				function search() {
+					var widget = document.getElementById('manual-search');
+					widget.search();
+				}
+			</script>
+
 			<h1>d2l-search-widget demo</h1>
 			<d2l-search-widget
+				id="widget"
 				placeholder-text="Search for things here!"
 				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
 				search-field-name="search"></d2l-search-widget>
@@ -24,9 +32,30 @@
 			Result:
 			<ul id="result">
 			</ul>
+
+			<d2l-search-widget
+				id="manual-search"
+				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
+				search-field-name="search"></d2l-search-widget>
+
+			Result:
+			<ul id="manual-search-result">
+			</ul>
+
+			<button onclick="search()">Search!</button>
+
 			<script>
-				document.querySelector('d2l-search-widget').addEventListener('search-results-changed', function(e) {
+				document.getElementById('widget').addEventListener('search-results-changed', function(e) {
 					var ul = document.getElementById('result');
+					ul.innerHTML = '';
+					e.detail.value.forEach(function(entity) {
+						var li = document.createElement('li');
+						li.innerHTML = entity.properties.name;
+						ul.appendChild(li);
+					});
+				});
+				document.getElementById('manual-search').addEventListener('search-results-changed', function(e) {
+					var ul = document.getElementById('manual-search-result');
 					ul.innerHTML = '';
 					e.detail.value.forEach(function(entity) {
 						var li = document.createElement('li');
