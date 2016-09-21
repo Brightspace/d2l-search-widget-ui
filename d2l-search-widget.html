@@ -135,15 +135,15 @@
 					value: 'search'
 				},
 				/*
-				* An array of objects containing the results of the search Action
+				* The Entity returned by the search Action
 				* @type {Array<Object>}
 				*/
 				searchResults: {
-					type: Array,
+					type: Object,
 					readOnly: true,
 					notify: true,
 					value: function() {
-						return [];
+						return {};
 					}
 				},
 				/*
@@ -229,7 +229,7 @@
 				if (response.detail.status === 200 || response.detail.status === 304) {
 					var parser = document.createElement('d2l-siren-parser');
 					var searchResponse = parser.parse(response.detail.xhr.response);
-					this._setSearchResults(searchResponse.entities || []);
+					this._setSearchResults(searchResponse || {});
 				}
 			},
 			_onSearchUrlChanged: function() {
