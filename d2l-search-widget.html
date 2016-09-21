@@ -89,7 +89,7 @@
 				on-keydown="_onSearchInputKeyPressed">
 			</input>
 
-			<button type="button" on-tap="_clearSearchResults" class="search-icon clear-search-button">
+			<button type="button" on-tap="clear" class="search-icon clear-search-button">
 				<iron-icon icon="d2l-tier1:close-default"></iron-icon>
 			</button>
 		</div>
@@ -161,12 +161,15 @@
 				}
 			},
 			/*
-			* Trigger the search manually. Useful if search needs to be triggered automatically for whatever reason.
+			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
 			search: function() {
 				this._onSearchButtonClick();
 			},
-			_clearSearchResults: function() {
+			/*
+			* Clears search text and triggers search.
+			*/
+			clear: function() {
 				this.set('_searchString', '');
 				this._onSearchButtonClick();
 			},
