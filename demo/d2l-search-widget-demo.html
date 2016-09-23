@@ -48,7 +48,7 @@
 				document.getElementById('widget').addEventListener('search-results-changed', function(e) {
 					var ul = document.getElementById('result');
 					ul.innerHTML = '';
-					e.detail.value.forEach(function(entity) {
+					e.detail.value.entities.forEach(function(entity) {
 						var li = document.createElement('li');
 						li.innerHTML = entity.properties.name;
 						ul.appendChild(li);
@@ -57,7 +57,7 @@
 				document.getElementById('manual-search').addEventListener('search-results-changed', function(e) {
 					var ul = document.getElementById('manual-search-result');
 					ul.innerHTML = '';
-					e.detail.value.forEach(function(entity) {
+					e.detail.value.entities.forEach(function(entity) {
 						var li = document.createElement('li');
 						li.innerHTML = entity.properties.name;
 						ul.appendChild(li);
