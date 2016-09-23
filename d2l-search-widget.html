@@ -232,9 +232,11 @@
 					this._setSearchResults(searchResponse || {});
 				}
 			},
-			_onSearchUrlChanged: function() {
-				// Using an observer means trying the same query multiple times will only generate one request
-				this.$.searchRequest.generateRequest();
+			_onSearchUrlChanged: function(url) {
+				if (url) {
+					// Using an observer means trying the same query multiple times will only generate one request
+					this.$.searchRequest.generateRequest();
+				}
 			}
 		});
 	</script>
