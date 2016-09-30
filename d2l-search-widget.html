@@ -5,6 +5,8 @@
 <link rel="import" href="../d2l-colors/d2l-colors.html">
 <link rel="import" href="../d2l-icons/d2l-icons.html">
 <link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
+<link rel="import" href="../d2l-typography/d2l-typography.html">
+<link rel="import" href="localize-behavior.html">
 
 <!--
 `<d2l-search-widget>` is a self-contained search widget.
@@ -84,20 +86,26 @@
 		</d2l-ajax>
 
 		<div class="search-bar">
-			<button type="button" on-tap="_onSearchButtonClick" class="search-icon search-button">
+			<button
+				type="button"
+				on-tap="_onSearchButtonClick"
+				class="search-icon search-button"
+				aria-label$="{{localize('search')}}">
 				<iron-icon icon="d2l-tier1:search"></iron-icon>
 			</button>
 
 			<input
 				is="iron-input"
 				bind-value="{{_searchString}}"
-				role="combobox"
-				aria-autocomplete="list"
 				placeholder="{{placeholderText}}"
 				on-keydown="_onSearchInputKeyPressed">
 			</input>
 
-			<button type="button" on-tap="clear" class="search-icon clear-search-button">
+			<button
+				type="button"
+				on-tap="clear"
+				class="search-icon clear-search-button"
+				aria-label$="{{localize('search.clear')}}">
 				<iron-icon icon="d2l-tier1:close-default"></iron-icon>
 			</button>
 		</div>
@@ -168,6 +176,9 @@
 					value: ''
 				}
 			},
+			behaviors: [
+				window.D2L.PolymerBehaviors.SearchWidget.LocalizeBehavior
+			],
 			/*
 			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
