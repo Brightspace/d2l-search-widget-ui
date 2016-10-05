@@ -149,8 +149,6 @@
 				*/
 				searchResults: {
 					type: Object,
-					readOnly: true,
-					notify: true,
 					value: function() {
 						return {};
 					}
@@ -241,12 +239,14 @@
 				if (response.detail.status === 200 || response.detail.status === 304) {
 					var parser = document.createElement('d2l-siren-parser');
 					var searchResponse = parser.parse(response.detail.xhr.response);
-					this._setSearchResults(searchResponse || {});
+					this.set('searchResults', searchResponse || {});
+					this.fire('search-results-changed', this.searchResults);
 				}
 			},
 			_onSearchUrlChanged: function(url) {
+				// Using an observer means if search button is clicked multiple times with
+				// the same query, only the first time generates a call
 				if (url) {
-					// Using an observer means trying the same query multiple times will only generate one request
 					this.$.searchRequest.generateRequest();
 				}
 			}

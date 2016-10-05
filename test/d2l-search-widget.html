@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+		<script src="../../web-component-tester/browser.js"></script>
+
+		<link rel="import" href="../d2l-search-widget.html">
+	</head>
+	<body>
+		<test-fixture id="search-widget-basic">
+			<template>
+				<d2l-search-widget></d2l-search-widget>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="search-widget">
+			<template>
+				<d2l-search-widget
+					search-action='{"name": "do-a-thing", "method": "GET", "href": "/some/url", "fields": [{"name": "query", "type": "search", "value": ""}]}'
+					search-field-name="query"></d2l-search-widget>
+			</template>
+		</test-fixture>
+
+		<script>
+		/* global describe, it, beforeEach, afterEach, fixture, expect, sinon */
+		'use strict';
+
+		describe('d2l-search-widget', function() {
+			var searchWidget,
+				searchWidgetBasic,
+				server,
+				entity = {
+					class: ['foo'],
+					properties: {
+						name: 'a-thing'
+					},
+					actions: [{
+						name: 'do-a-thing',
+						method: 'GET',
+						href: '/some/url',
+						fields: [{
+							name: 'query',
+							type: 'search',
+							value: ''
+						}]
+					}]
+				};
+
+			beforeEach(function() {
+				searchWidget = fixture('search-widget');
+				searchWidgetBasic = fixture('search-widget-basic');
+				server = sinon.fakeServer.create();
+				server.respondImmediately = true;
+			});
+
+			afterEach(function() {
+				server.restore();
+			});
+
+			it('has sensible defaults', function() {
+				expect(searchWidgetBasic.searchAction).to.be.undefined;
+				expect(searchWidgetBasic.searchFieldName).to.equal('search');
+			});
+
+			it('can have searchAction and searchFieldName set', function() {
+				searchWidgetBasic.searchAction = entity.actions[0];
+				searchWidgetBasic.searchFieldName = 'query';
+				expect(searchWidgetBasic.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
+				expect(searchWidgetBasic.searchFieldName).to.equal('query');
+			});
+
+			it('correctly parses search-action and search-field-name attributes', function() {
+				expect(searchWidget.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
+				expect(searchWidget.searchFieldName).to.equal('query');
+			});
+
+			it('should fire a search-results-changed event when search completes', function(done) {
+				server.respondWith(
+					'GET',
+					/.*/,
+					function(req) {
+						req.respond(200, {}, JSON.stringify(entity));
+					});
+
+				var listener = function(e) {
+					expect(e.detail).to.be.an('object');
+					expect(e.detail.properties.name).to.equal('a-thing');
+					document.removeEventListener('search-results-changed', listener, false);
+					done();
+				};
+				document.addEventListener('search-results-changed', listener);
+				searchWidget.search();
+			});
+
+			it('should fire a search-results-changed event when the search is cleared', function(done) {
+				server.respondWith(
+					'GET',
+					/.*/,
+					function(req) {
+						req.respond(200, {}, JSON.stringify({}));
+					});
+
+				var listener = function(e) {
+					expect(e.detail).to.be.an('object');
+					expect(e.detail.properties).to.be.undefined;
+					document.removeEventListener('search-results-changed', listener, false);
+					done();
+				};
+				document.addEventListener('search-results-changed', listener);
+				searchWidget.clear();
+			});
+		});
+		</script>
+	</body>
+</html>
