@@ -111,6 +111,24 @@
 				document.addEventListener('search-results-changed', listener);
 				searchWidget.clear();
 			});
+
+			it('should URI-encode query strings', function(done) {
+				server.respondWith(
+					'GET',
+					/.*/,
+					function(req) {
+						expect(req.url).to.match(/something%26something%20something/);
+						req.respond(200, {}, JSON.stringify({}));
+					});
+
+				searchWidget._searchString = 'something&something something';
+				var listener = function() {
+					document.removeEventListener('search-results-changed', listener, false);
+					done();
+				};
+				document.addEventListener('search-results-changed', listener);
+				searchWidget.search();
+			});
 		});
 		</script>
 	</body>

@@ -220,7 +220,7 @@
 				}
 
 				var query = {};
-				query[this.searchFieldName] = this._searchString;
+				query[this.searchFieldName] = encodeURIComponent(this._searchString);
 
 				this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 			},
