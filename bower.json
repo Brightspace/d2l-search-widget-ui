@@ -22,7 +22,7 @@
   "dependencies": {
     "d2l-ajax": "^2.0.0",
     "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
-    "d2l-typography": "^4.1.0",
+    "d2l-typography": "^5.0.0",
     "d2l-icons": "^2.7.0",
     "iron-input": "^1.0.10",
     "polymer": "^1.6.1",
