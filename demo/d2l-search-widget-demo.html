@@ -67,7 +67,7 @@
 			</p>
 
 			<script>
-				document.getElementById('widget').addEventListener('search-results-changed', function(e) {
+				document.getElementById('widget').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('result');
 					ul.innerHTML = '';
 					e.detail.entities.forEach(function(entity) {
@@ -76,7 +76,7 @@
 						ul.appendChild(li);
 					});
 				});
-				document.getElementById('manual-search').addEventListener('search-results-changed', function(e) {
+				document.getElementById('manual-search').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('manual-search-result');
 					ul.innerHTML = '';
 					e.detail.entities.forEach(function(entity) {
@@ -85,7 +85,7 @@
 						ul.appendChild(li);
 					});
 				});
-				document.getElementById('small-search').addEventListener('search-results-changed', function(e) {
+				document.getElementById('small-search').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('small-search-result');
 					ul.innerHTML = '';
 					e.detail.entities.forEach(function(entity) {

@@ -120,7 +120,7 @@
 				* when the search field is cleared by the user. The detail of the event is
 				* the search results, which can then be parsed in the handler.
 				*
-				* @event search-results-changed
+				* @event d2l-search-widget-results-changed
 				*/
 
 				/*
@@ -238,7 +238,7 @@
 					var parser = document.createElement('d2l-siren-parser');
 					var searchResponse = parser.parse(response.detail.xhr.response);
 					this.set('searchResults', searchResponse || {});
-					this.fire('search-results-changed', this.searchResults);
+					this.fire('d2l-search-widget-results-changed', this.searchResults);
 				}
 			},
 			_onSearchUrlChanged: function(url) {
