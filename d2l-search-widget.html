@@ -18,7 +18,6 @@
 		<style include="d2l-typography"></style>
 		<style>
 			:host {
-				--height: var(--d2l-search-widget-height, 60px);
 				position: relative;
 				display: block;
 				padding: 0;
@@ -27,17 +26,17 @@
 			input {
 				@apply(--d2l-body-small-text);
 				color: var(--d2l-color-ferrite);
-				font-size: calc(var(--height) / 3);
+				font-size: calc(var(--d2l-search-widget-height, 60px) / 3);
 				width: 100%;
-				height: var(--height);
+				height: var(--d2l-search-widget-height, 60px);
 				border: 1px solid var(--d2l-color-titanius);
 				border-radius: .3rem;
 				box-shadow: inset 0 2px 0 0 rgba(185,194,208,.2);
 				box-sizing: border-box;
 				transition: background-color 0.5s ease, border-color 0.5s ease;
 				-webkit-transition: background-color 0.5s ease, border-color 0.5s ease;
-				padding-left: var(--height);
-				padding-right: var(--height);
+				padding-left: var(--d2l-search-widget-height, 60px);
+				padding-right: var(--d2l-search-widget-height, 60px);
 			}
 			input:focus,
 			input:hover {
@@ -45,8 +44,8 @@
 				border-width: 2px;
 				outline: 0;
 				/* Subtract 1px for increased border width */
-				padding-left: calc(var(--height) - 1px);
-				padding-right: calc(var(--height) - 1px);
+				padding-left: calc(var(--d2l-search-widget-height, 60px) - 1px);
+				padding-right: calc(var(--d2l-search-widget-height, 60px) - 1px);
 			}
 			input::-ms-clear {
 				display: none;
@@ -54,12 +53,12 @@
 			.search-bar > button {
 				position: absolute;
 				top: 0px;
-				margin: calc(var(--height) / 6);
+				margin: calc(var(--d2l-search-widget-height, 60px) / 6);
 				background: none;
 				border: 1px solid transparent;
 				cursor: pointer;
-				height: calc(2 * var(--height) / 3);
-				width: calc(2 * var(--height) / 3);
+				height: calc(2 * var(--d2l-search-widget-height, 60px) / 3);
+				width: calc(2 * var(--d2l-search-widget-height, 60px) / 3);
 			}
 			.search-bar > button:hover,
 			.search-bar > button:focus {
@@ -67,8 +66,8 @@
 				border-radius: 0.3rem;
 			}
 			d2l-icon {
-				--d2l-icon-height: calc(var(--height) / 3);
-				--d2l-icon-width: calc(var(--height) / 3);
+				--d2l-icon-height: calc(var(--d2l-search-widget-height, 60px) / 3);
+				--d2l-icon-width: calc(var(--d2l-search-widget-height, 60px) / 3);
 				color: var(--d2l-color-tungsten);
 			}
 			.clear-search-button {
