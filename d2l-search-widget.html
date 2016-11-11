@@ -124,6 +124,14 @@
 				*/
 
 				/*
+				* If true, responses are cached locally (cleared on page refresh)
+				* @type {Boolean}
+				*/
+				cacheResponses: {
+					type: Boolean,
+					value: false
+				},
+				/*
 				* Placeholder text that appears in the search field
 				* @type {String}
 				*/
@@ -151,6 +159,15 @@
 				* @type {Object}
 				*/
 				searchResults: Object,
+				/*
+				* Search URL -> response object
+				* Rather than redoing requests, cache their results.
+				* @type {Object}
+				*/
+				_searchResultsCache: {
+					type: Object,
+					value: {}
+				},
 				/*
 				* Actual URL called for the search, generated from searchAction/FieldName
 				* @type {String}
@@ -238,6 +255,11 @@
 					var parser = document.createElement('d2l-siren-parser');
 					var searchResponse = parser.parse(response.detail.xhr.response);
 					this.set('searchResults', searchResponse || {});
+
+					if (this.cacheResponses) {
+						this._searchResultsCache[response.detail.url] = this.searchResults;
+					}
+
 					this.fire('d2l-search-widget-results-changed', this.searchResults);
 				}
 			},
@@ -245,7 +267,13 @@
 				// Using an observer means if search button is clicked multiple times with
 				// the same query, only the first time generates a call
 				if (url) {
-					this.$.searchRequest.generateRequest();
+					if (this.cacheResponses && this._searchResultsCache[url]) {
+						// Don't redo the call if we've done it before
+						this.set('searchResults', this._searchResultsCache[url]);
+						this.fire('d2l-search-widget-results-changed', this.searchResults);
+					} else {
+						this.$.searchRequest.generateRequest();
+					}
 				}
 			}
 		});

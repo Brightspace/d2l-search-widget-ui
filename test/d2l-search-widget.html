@@ -23,6 +23,15 @@
 			</template>
 		</test-fixture>
 
+		<test-fixture id="search-widget-cached">
+			<template>
+				<d2l-search-widget
+					search-action='{"name": "do-a-thing", "method": "GET", "href": "/some/url", "fields": [{"name": "query", "type": "search", "value": ""}]}'
+					search-field-name="query"
+					cache-responses="true"></d2l-search-widget>
+			</template>
+		</test-fixture>
+
 		<script>
 		/* global describe, it, beforeEach, afterEach, fixture, expect, sinon */
 		'use strict';
@@ -30,6 +39,7 @@
 		describe('d2l-search-widget', function() {
 			var searchWidget,
 				searchWidgetBasic,
+				searchWidgetCached,
 				server,
 				entity = {
 					class: ['foo'],
@@ -51,6 +61,7 @@
 			beforeEach(function() {
 				searchWidget = fixture('search-widget');
 				searchWidgetBasic = fixture('search-widget-basic');
+				searchWidgetCached = fixture('search-widget-cached');
 				server = sinon.fakeServer.create();
 				server.respondImmediately = true;
 			});
@@ -128,6 +139,84 @@
 				};
 				document.addEventListener('d2l-search-widget-results-changed', listener);
 				searchWidget.search();
+			});
+
+			describe('cacheResponses', function() {
+				it('should not cache responses by default', function(done) {
+					var url;
+					server.respondWith(
+						'GET',
+						/.*/,
+						function(req) {
+							url = req.url;
+							req.respond(200, {}, JSON.stringify(entity));
+						});
+
+					var listener = function() {
+						expect(searchWidget._searchResultsCache[url]).to.be.undefined;
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					searchWidget.search();
+				});
+
+				it('should cache the response for a given URL', function(done) {
+					var url;
+					server.respondWith(
+						'GET',
+						/.*/,
+						function(req) {
+							url = req.url;
+							req.respond(200, {}, JSON.stringify(entity));
+						});
+
+					var listener = function() {
+						expect(searchWidgetCached._searchResultsCache[url]).to.not.be.undefined;
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					searchWidgetCached.search();
+				});
+
+				it('should not re-request if a URLs response is already cached', function(done) {
+					var url;
+					server.respondWith(
+						'GET',
+						/.*/,
+						function(req) {
+							url = req.url;
+							req.respond(200, {}, JSON.stringify(entity));
+						});
+
+					var spy;
+
+					var firstListener = function() {
+						// Initial search response - should hit fakeServer
+						document.removeEventListener('d2l-search-widget-results-changed', firstListener, false);
+						document.addEventListener('d2l-search-widget-results-changed', secondListener);
+						expect(searchWidgetCached._searchResultsCache[url]).to.not.be.undefined;
+						searchWidgetCached.clear();
+					};
+					var secondListener = function() {
+						// Clearing search response - should hit fakeServer
+						document.removeEventListener('d2l-search-widget-results-changed', secondListener, false);
+						document.addEventListener('d2l-search-widget-results-changed', thirdListener);
+						spy = sinon.spy(searchWidgetCached.$.searchRequest, 'generateRequest');
+						searchWidgetCached._searchString = 'foo';
+						searchWidgetCached.search();
+					};
+					var thirdListener = function() {
+						// Second 'foo' search response - should hit cached responses
+						document.removeEventListener('d2l-search-widget-results-changed', thirdListener, false);
+						expect(spy.called).to.be.false;
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', firstListener);
+					searchWidgetCached._searchString = 'foo';
+					searchWidgetCached.search();
+				});
 			});
 		});
 		</script>
