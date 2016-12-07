@@ -27,6 +27,6 @@
     "d2l-typography": "^5.2.2",
     "d2l-icons": "^2.15.2",
     "iron-input": "^1.0.10",
-    "polymer": "^1.6.1"
+    "polymer": "^1.7.0"
   }
 }
