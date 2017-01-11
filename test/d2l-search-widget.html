@@ -141,6 +141,39 @@
 				searchWidget.search();
 			});
 
+			describe('button icon', function() {
+				it('should default to a search icon', function() {
+					expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('search');
+				});
+
+				it('should change to an X icon when a search is done', function(done) {
+					server.respondWith('GET', /.*/, [200, {}, JSON.stringify({})]);
+
+					var listener = function() {
+						expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('close-default');
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					searchWidget.search();
+				});
+
+				it('should change to a search icon when cleared', function(done) {
+					server.respondWith('GET', /.*/, [200, {}, JSON.stringify({})]);
+
+					searchWidget.$$('d2l-icon').setAttribute('icon', 'foo');
+					expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.equal('foo');
+
+					var listener = function() {
+						expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('search');
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					searchWidget.clear();
+				});
+			});
+
 			describe('cacheResponses', function() {
 				it('should not cache responses by default', function(done) {
 					var url;
@@ -203,7 +236,7 @@
 						// Clearing search response - should hit fakeServer
 						document.removeEventListener('d2l-search-widget-results-changed', secondListener, false);
 						document.addEventListener('d2l-search-widget-results-changed', thirdListener);
-						spy = sinon.spy(searchWidgetCached.$.searchRequest, 'generateRequest');
+						spy = sinon.spy(searchWidgetCached.$$('d2l-ajax'), 'generateRequest');
 						searchWidgetCached._searchString = 'foo';
 						searchWidgetCached.search();
 					};

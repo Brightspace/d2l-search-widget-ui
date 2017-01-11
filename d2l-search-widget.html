@@ -33,7 +33,7 @@
 				box-sizing: border-box;
 				transition: background-color 0.5s ease, border-color 0.5s ease;
 				-webkit-transition: background-color 0.5s ease, border-color 0.5s ease;
-				padding-left: var(--d2l-search-widget-height, 60px);
+				padding-left: calc(var(--d2l-search-widget-height, 60px) / 6);
 				padding-right: var(--d2l-search-widget-height, 60px);
 			}
 			input:focus,
@@ -42,15 +42,16 @@
 				border-width: 2px;
 				outline: 0;
 				/* Subtract 1px for increased border width */
-				padding-left: calc(var(--d2l-search-widget-height, 60px) - 1px);
+				padding-left: calc(var(--d2l-search-widget-height, 60px) / 6 - 1px);
 				padding-right: calc(var(--d2l-search-widget-height, 60px) - 1px);
 			}
 			input::-ms-clear {
 				display: none;
 			}
-			.search-bar > button {
+			:host button {
 				position: absolute;
 				top: 0px;
+				right: 0px;
 				margin: calc(var(--d2l-search-widget-height, 60px) / 6);
 				background: none;
 				border: 1px solid transparent;
@@ -58,8 +59,8 @@
 				height: calc(2 * var(--d2l-search-widget-height, 60px) / 3);
 				width: calc(2 * var(--d2l-search-widget-height, 60px) / 3);
 			}
-			.search-bar > button:hover,
-			.search-bar > button:focus {
+			:host button:hover,
+			:host button:focus {
 				border-color: var(--d2l-color-pressicus);
 				border-radius: 0.3rem;
 			}
@@ -68,41 +69,28 @@
 				--d2l-icon-width: calc(var(--d2l-search-widget-height, 60px) / 3);
 				color: var(--d2l-color-tungsten);
 			}
-			.clear-search-button {
-				right: 0px;
-			}
 		</style>
 
 		<d2l-ajax
-			id="searchRequest"
 			url="[[_searchUrl]]"
 			headers='{ "Accept": "application/vnd.siren+json" }'
 			on-iron-ajax-response="_onSearchResponse">
 		</d2l-ajax>
 
-		<div class="search-bar">
-			<button
-				type="button"
-				on-tap="_onSearchButtonClick"
-				aria-label$="{{localize('search')}}">
-				<d2l-icon icon="d2l-tier1:search"></d2l-icon>
-			</button>
+		<input
+			is="iron-input"
+			bind-value="{{_searchString}}"
+			placeholder="{{placeholderText}}"
+			on-keydown="_onSearchInputKeyPressed"
+			on-input="_setSearchIcon">
+		</input>
 
-			<input
-				is="iron-input"
-				bind-value="{{_searchString}}"
-				placeholder="{{placeholderText}}"
-				on-keydown="_onSearchInputKeyPressed">
-			</input>
-
-			<button
-				type="button"
-				on-tap="clear"
-				class="clear-search-button"
-				aria-label$="{{localize('search.clear')}}">
-				<d2l-icon icon="d2l-tier1:close-default"></d2l-icon>
-			</button>
-		</div>
+		<button
+			type="button"
+			on-tap="_onButtonClick"
+			aria-label$="{{localize('search')}}">
+			<d2l-icon icon="d2l-tier1:search"></d2l-icon>
+		</button>
 	</template>
 	<script>
 		'use strict';
@@ -172,7 +160,6 @@
 				*/
 				_searchUrl: {
 					type: String,
-					value: '',
 					observer: '_onSearchUrlChanged'
 				},
 				_searchString: {
@@ -187,14 +174,37 @@
 			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
 			search: function() {
-				this._onSearchButtonClick();
+				if (this._searchString.length > 0) {
+					// If the search is for a non-empty query, switch the clear button
+					this._setClearIcon();
+				}
+				this._setSearchUrl();
 			},
 			/*
 			* Clears search text and triggers search.
 			*/
 			clear: function() {
 				this.set('_searchString', '');
-				this._onSearchButtonClick();
+				this._setSearchIcon();
+				this._setSearchUrl();
+			},
+			_setClearIcon: function() {
+				this.$$('d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
+				this.$$('button').setAttribute('aria-label', this.localize('search.clear'));
+			},
+			_setSearchIcon: function() {
+				this.$$('d2l-icon').setAttribute('icon', 'd2l-tier1:search');
+				this.$$('button').setAttribute('aria-label', this.localize('search'));
+			},
+			_setSearchUrl: function() {
+				if (!this._searchAction) {
+					return;
+				}
+
+				var query = {};
+				query[this.searchFieldName] = encodeURIComponent(this._searchString);
+
+				this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 			},
 			/*
 			* Creates a URL with a query from an Action and an object of required parameters
@@ -220,6 +230,14 @@
 
 				return queryString ? action.href + '?' + queryString : action.href;
 			},
+			_onButtonClick: function() {
+				var icon = this.$$('d2l-icon').getAttribute('icon');
+				if (icon.indexOf('search') > -1) {
+					this.search();
+				} else {
+					this.clear();
+				}
+			},
 			_onSearchActionChanged: function(searchAction) {
 				if ('string' === typeof searchAction) {
 					searchAction = JSON.parse(searchAction);
@@ -232,30 +250,20 @@
 				var parser = document.createElement('d2l-siren-parser');
 				this.set('_searchAction', parser.parse(entity).actions[0]);
 			},
-			_onSearchButtonClick: function() {
-				if (!this._searchAction) {
-					return;
-				}
-
-				var query = {};
-				query[this.searchFieldName] = encodeURIComponent(this._searchString);
-
-				this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
-			},
 			_onSearchInputKeyPressed: function(e) {
-				// If Enter key pressed, do the search
 				if (e.keyCode === 13) {
-					this._onSearchButtonClick();
+					// If Enter key pressed, do the search
+					this.search();
 				}
 			},
-			_onSearchResponse: function(response) {
-				if (response.detail.status === 200 || response.detail.status === 304) {
+			_onSearchResponse: function(e) {
+				if (e.detail.status === 200 || e.detail.status === 304) {
 					var parser = document.createElement('d2l-siren-parser');
-					var searchResponse = parser.parse(response.detail.xhr.response);
+					var searchResponse = parser.parse(e.detail.xhr.response);
 					this.set('searchResults', searchResponse || {});
 
 					if (this.cacheResponses) {
-						this._searchResultsCache[response.detail.url] = this.searchResults;
+						this._searchResultsCache[e.detail.url] = this.searchResults;
 					}
 
 					this.fire('d2l-search-widget-results-changed', this.searchResults);
@@ -270,7 +278,7 @@
 						this.set('searchResults', this._searchResultsCache[url]);
 						this.fire('d2l-search-widget-results-changed', this.searchResults);
 					} else {
-						this.$.searchRequest.generateRequest();
+						this.$$('d2l-ajax').generateRequest();
 					}
 				}
 			}

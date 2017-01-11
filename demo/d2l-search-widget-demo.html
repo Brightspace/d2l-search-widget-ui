@@ -32,8 +32,8 @@
 			<h3>Normal search</h3>
 			<d2l-search-widget
 				id="widget"
-				placeholder-text="Type and hit Enter to search!"
-				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
+				placeholder-text="Type and hit Enter or click icon to search!"
+				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
 				search-field-name="search"></d2l-search-widget>
 			<p>
 				Result:
@@ -44,9 +44,10 @@
 			<h3>Search via external button</h3>
 			<d2l-search-widget
 				id="manual-search"
-				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
+				placeholder-text="Type and hit Enter, click icon, or click Go to search!"
+				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
 				search-field-name="search"></d2l-search-widget>
-			<button onclick="search()">Search!</button>
+			<button onclick="search()">Go!</button>
 			<p>
 				Result:
 				<ul id="manual-search-result">
@@ -58,7 +59,7 @@
 				id="small-search"
 				placeholder-text="I'm a small search field"
 				class="small"
-				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/organizationsResponse.json","fields":[{"name":"search","type":"search","value":""},{"name":"page","type":"number","value":"1"},{"name":"pageSize","type":"number","value":"3"},{"name":"embedDepth","type":"number","value":"1"},{"name":"organizationTypeIds","type":"hidden","value":""}]}'
+				search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
 				search-field-name="search"></d2l-search-widget>
 			<p>
 				Result:
@@ -69,30 +70,21 @@
 			<script>
 				document.getElementById('widget').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('result');
-					ul.innerHTML = '';
-					e.detail.entities.forEach(function(entity) {
-						var li = document.createElement('li');
-						li.innerHTML = entity.properties.name;
-						ul.appendChild(li);
-					});
+					var li = document.createElement('li');
+					li.innerHTML = e.detail.properties.name;
+					ul.appendChild(li);
 				});
 				document.getElementById('manual-search').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('manual-search-result');
-					ul.innerHTML = '';
-					e.detail.entities.forEach(function(entity) {
-						var li = document.createElement('li');
-						li.innerHTML = entity.properties.name;
-						ul.appendChild(li);
-					});
+					var li = document.createElement('li');
+					li.innerHTML = e.detail.properties.name;
+					ul.appendChild(li);
 				});
 				document.getElementById('small-search').addEventListener('d2l-search-widget-results-changed', function(e) {
 					var ul = document.getElementById('small-search-result');
-					ul.innerHTML = '';
-					e.detail.entities.forEach(function(entity) {
-						var li = document.createElement('li');
-						li.innerHTML = entity.properties.name;
-						ul.appendChild(li);
-					});
+					var li = document.createElement('li');
+					li.innerHTML = e.detail.properties.name;
+					ul.appendChild(li);
 				});
 			</script>
 		</main>
