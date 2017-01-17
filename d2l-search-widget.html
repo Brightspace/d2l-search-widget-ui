@@ -79,7 +79,7 @@
 
 		<input
 			is="iron-input"
-			bind-value="{{_searchString}}"
+			bind-value="{{_searchInput}}"
 			placeholder="{{placeholderText}}"
 			on-keydown="_onSearchInputKeyPressed"
 			on-input="_setSearchIcon">
@@ -162,9 +162,9 @@
 					type: String,
 					observer: '_onSearchUrlChanged'
 				},
-				_searchString: {
+				_searchInput: {
 					type: String,
-					value: ''
+					observer: '_onSearchInputChanged'
 				}
 			},
 			behaviors: [
@@ -174,7 +174,9 @@
 			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
 			search: function() {
-				if (this._searchString.length > 0) {
+				this._isSearched = true;
+				this._updateIcon();
+				if (this._searchInput.length > 0) {
 					// If the search is for a non-empty query, switch the clear button
 					this._setClearIcon();
 				}
@@ -184,9 +186,14 @@
 			* Clears search text and triggers search.
 			*/
 			clear: function() {
-				this.set('_searchString', '');
-				this._setSearchIcon();
+				this.set('_searchInput', '');
+				this._isSearched = false;
+				this._updateIcon();
 				this._setSearchUrl();
+			},
+			_isSearched: false,
+			_updateIcon: function() {
+				this._isSearched ? this._setClearIcon() : this._setSearchIcon();
 			},
 			_setClearIcon: function() {
 				this.$$('d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
@@ -202,7 +209,7 @@
 				}
 
 				var query = {};
-				query[this.searchFieldName] = encodeURIComponent(this._searchString);
+				query[this.searchFieldName] = encodeURIComponent(this._searchInput);
 
 				this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 			},
@@ -231,12 +238,13 @@
 				return queryString ? action.href + '?' + queryString : action.href;
 			},
 			_onButtonClick: function() {
-				var icon = this.$$('d2l-icon').getAttribute('icon');
-				if (icon.indexOf('search') > -1) {
-					this.search();
-				} else {
+				if (this._isSearched) {
 					this.clear();
+				} else {
+					this.search();
 				}
+				this._isSearched = !this._isSearched;
+				this._updateIcon();
 			},
 			_onSearchActionChanged: function(searchAction) {
 				if ('string' === typeof searchAction) {
@@ -249,6 +257,14 @@
 				};
 				var parser = document.createElement('d2l-siren-parser');
 				this.set('_searchAction', parser.parse(entity).actions[0]);
+			},
+			_onSearchInputChanged: function(newSearchString) {
+				if (newSearchString.length === 0) {
+					return;
+				}
+				// Need to directly set search icon, as _isSearched may already be true here
+				// e.g. user types, searches, then adds a character to search string
+				this._setSearchIcon();
 			},
 			_onSearchInputKeyPressed: function(e) {
 				if (e.keyCode === 13) {
