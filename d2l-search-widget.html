@@ -192,15 +192,16 @@
 				this._setSearchUrl();
 			},
 			_isSearched: false,
+			_parser: null,
 			_updateIcon: function() {
 				this._isSearched ? this._setClearIcon() : this._setSearchIcon();
 			},
 			_setClearIcon: function() {
-				this.$$('d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
+				this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
 				this.$$('button').setAttribute('aria-label', this.localize('search.clear'));
 			},
 			_setSearchIcon: function() {
-				this.$$('d2l-icon').setAttribute('icon', 'd2l-tier1:search');
+				this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:search');
 				this.$$('button').setAttribute('aria-label', this.localize('search'));
 			},
 			_setSearchUrl: function() {
@@ -255,8 +256,8 @@
 				var entity = {
 					actions: [ searchAction ]
 				};
-				var parser = document.createElement('d2l-siren-parser');
-				this.set('_searchAction', parser.parse(entity).actions[0]);
+				this._parser = this._parser || document.createElement('d2l-siren-parser');
+				this.set('_searchAction', this._parser.parse(entity).actions[0]);
 			},
 			_onSearchInputChanged: function(newSearchString) {
 				if (newSearchString.length === 0) {
@@ -274,8 +275,8 @@
 			},
 			_onSearchResponse: function(e) {
 				if (e.detail.status === 200 || e.detail.status === 304) {
-					var parser = document.createElement('d2l-siren-parser');
-					var searchResponse = parser.parse(e.detail.xhr.response);
+					this._parser = this._parser || document.createElement('d2l-siren-parser');
+					var searchResponse = this._parser.parse(e.detail.xhr.response);
 					this.set('searchResults', searchResponse || {});
 
 					if (this.cacheResponses) {

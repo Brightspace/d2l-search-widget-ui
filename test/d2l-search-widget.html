@@ -142,8 +142,9 @@
 			});
 
 			describe('button icon', function() {
-				it('should default to a search icon', function() {
-					expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('search');
+				it('should default to a search icon and correct ARIA label', function() {
+					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
+					expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
 				});
 
 				it('should change to an X icon when a search is done', function(done) {
@@ -151,7 +152,8 @@
 
 					var listener = function() {
 						expect(searchWidget._isSearched).to.be.true;
-						expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('close-default');
+						expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
+						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
@@ -164,11 +166,12 @@
 
 					searchWidget._isSearched = true;
 					searchWidget._updateIcon();
-					expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('close-default');
+					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
 
 					var listener = function() {
 						expect(searchWidget._isSearched).to.be.false;
 						expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('search');
+						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
@@ -181,15 +184,17 @@
 
 					searchWidget._isSearched = true;
 					searchWidget._updateIcon();
-					expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('close-default');
+					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
 
 					var listener = function() {
 						expect(searchWidget._isSearched).to.be.true;
 						expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
+						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
 
 						searchWidget._searchInput = 'foo';
 						expect(searchWidget._isSearched).to.be.true;
 						expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
+						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
