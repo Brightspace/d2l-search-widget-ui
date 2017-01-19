@@ -158,7 +158,7 @@
 						done();
 					};
 					document.addEventListener('d2l-search-widget-results-changed', listener);
-					searchWidget.search();
+					searchWidget.$$('button').click();
 				});
 
 				it('should change to a search icon when cleared', function(done) {
@@ -176,15 +176,11 @@
 						done();
 					};
 					document.addEventListener('d2l-search-widget-results-changed', listener);
-					searchWidget.clear();
+					searchWidget.$$('button').click();
 				});
 
-				it('should switch back to search icon when search string is updated, even if in the searched state', function(done) {
+				it('should switch back to search icon when search string is updated', function(done) {
 					server.respondWith('GET', /.*/, [200, {}, JSON.stringify({})]);
-
-					searchWidget._isSearched = true;
-					searchWidget._updateIcon();
-					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
 
 					var listener = function() {
 						expect(searchWidget._isSearched).to.be.true;
@@ -192,14 +188,14 @@
 						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
 
 						searchWidget._searchInput = 'foo';
-						expect(searchWidget._isSearched).to.be.true;
+						expect(searchWidget._isSearched).to.be.false;
 						expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
 						expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
 					document.addEventListener('d2l-search-widget-results-changed', listener);
-					searchWidget.search();
+					searchWidget.$$('button').click();
 				});
 			});
 

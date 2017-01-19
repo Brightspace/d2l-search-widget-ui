@@ -174,12 +174,6 @@
 			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
 			search: function() {
-				this._isSearched = true;
-				this._updateIcon();
-				if (this._searchInput.length > 0) {
-					// If the search is for a non-empty query, switch the clear button
-					this._setClearIcon();
-				}
 				this._setSearchUrl();
 			},
 			/*
@@ -187,8 +181,6 @@
 			*/
 			clear: function() {
 				this.set('_searchInput', '');
-				this._isSearched = false;
-				this._updateIcon();
 				this._setSearchUrl();
 			},
 			_isSearched: false,
@@ -263,6 +255,7 @@
 				if (newSearchString.length === 0) {
 					return;
 				}
+				this._isSearched = false;
 				// Need to directly set search icon, as _isSearched may already be true here
 				// e.g. user types, searches, then adds a character to search string
 				this._setSearchIcon();
@@ -270,6 +263,8 @@
 			_onSearchInputKeyPressed: function(e) {
 				if (e.keyCode === 13) {
 					// If Enter key pressed, do the search
+					this._isSearched = true;
+					this._updateIcon();
 					this.search();
 				}
 			},
