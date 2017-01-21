@@ -20,7 +20,7 @@
     "iron-component-page": "^1.1.7"
   },
   "dependencies": {
-    "app-localize-behavior": "https://github.com/Brightspace/app-localize-behavior.git#master",
+    "app-localize-behavior": "PolymerElements/app-localize-behavior#~0.10.0",
     "d2l-ajax": "^3.0.0",
     "d2l-colors": "^2.2.3",
     "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
