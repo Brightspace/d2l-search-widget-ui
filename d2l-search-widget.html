@@ -174,12 +174,14 @@
 			* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
 			*/
 			search: function() {
+				this._isSearched = true;
 				this._setSearchUrl();
 			},
 			/*
 			* Clears search text and triggers search.
 			*/
 			clear: function() {
+				this._isSearched = false;
 				this.set('_searchInput', '');
 				this._setSearchUrl();
 			},
@@ -236,7 +238,6 @@
 				} else {
 					this.search();
 				}
-				this._isSearched = !this._isSearched;
 				this._updateIcon();
 			},
 			_onSearchActionChanged: function(searchAction) {
@@ -263,9 +264,8 @@
 			_onSearchInputKeyPressed: function(e) {
 				if (e.keyCode === 13) {
 					// If Enter key pressed, do the search
-					this._isSearched = true;
-					this._updateIcon();
 					this.search();
+					this._updateIcon();
 				}
 			},
 			_onSearchResponse: function(e) {
