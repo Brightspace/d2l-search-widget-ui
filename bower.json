@@ -25,7 +25,7 @@
     "d2l-colors": "^2.2.3",
     "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
     "d2l-typography": "^5.2.2",
-    "d2l-icons": "^2.15.2",
+    "d2l-icons": "^3.0.0",
     "iron-input": "^1.0.10",
     "polymer": "^1.7.0"
   }
