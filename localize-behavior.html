@@ -1,0 +1,95 @@
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+
+<script>
+'use strict';
+
+(function() {
+	window.D2L = window.D2L || {};
+	window.D2L.SearchWidget = window.D2L.SearchWidget || {};
+
+	/** @polymerBehavior D2L.PolymerBehaviors.SearchWidget.LocalizeBehavior */
+	window.D2L.SearchWidget.LocalizeBehaviorImpl = {
+		properties: {
+			language: {
+				type: String,
+				computed: '_computeLanguage(resources)'
+			},
+			resources: {
+				value: function() {
+					var langs = {
+						'en': {
+							'search': 'Search',
+							'search.clear': 'Clear Search'
+						},
+						'ar': {
+							'search': 'بحث',
+							'search.clear': 'مسح البحث'
+						},
+						'es': {
+							'search': 'Buscar',
+							'search.clear': 'Borrar búsqueda'
+						},
+						'fr': {
+							'search': 'Rechercher',
+							'search.clear': 'Effacer la recherche'
+						},
+						'ja': {
+							'search': '検索',
+							'search.clear': '検索のクリア'
+						},
+						'ko': {
+							'search': '검색',
+							'search.clear': '검색 지우기'
+						},
+						'nl': {
+							'search': 'Zoeken',
+							'search.clear': 'Zoekopdracht wissen'
+						},
+						'pt': {
+							'search': 'Pesquisar',
+							'search.clear': 'Limpar Pesquisa'
+						},
+						'sv': {
+							'search': 'Sökning',
+							'search.clear': 'Rensa sökning'
+						},
+						'tr': {
+							'search': 'Ara',
+							'search.clear': 'Aramayı Temizle'
+						},
+						'zh': {
+							'search': '搜索',
+							'search.clear': '清除搜索'
+						},
+						'zh-tw': {
+							'search': '搜尋',
+							'search.clear': '清除搜尋'
+						}
+					};
+					return langs;
+				}
+			}
+		},
+		_computeLanguage: function(resources) {
+			var locale = document.documentElement.lang
+				|| document.documentElement.getAttribute('data-lang-default')
+				|| 'en-us';
+			locale = locale.toLowerCase();
+			if (resources[locale]) {
+				return locale;
+			}
+			var langAndRegion = locale.split('-');
+			if (resources[langAndRegion[0]]) {
+				return langAndRegion[0];
+			}
+			return 'en';
+		}
+	};
+
+	/** @polymerBehavior */
+	window.D2L.SearchWidget.LocalizeBehavior = [
+		Polymer.AppLocalizeBehavior,
+		window.D2L.SearchWidget.LocalizeBehaviorImpl
+	];
+})();
+</script>
