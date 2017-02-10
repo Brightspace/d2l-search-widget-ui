@@ -1,0 +1,258 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
+
+<script>
+'use strict';
+
+(function() {
+	window.D2L = window.D2L || {};
+	window.D2L.PolymerBehaviors = window.D2L.PolymerBehaviors || {};
+
+	/** @polymerBehavior window.D2L.PolymerBehaviors.SearchWidgetLocalizeBehaviorImpl */
+	var LocalizeBehaviorImpl = {
+		properties: {
+			language: {
+				type: String,
+				computed: '_computeLanguage(resources)'
+			},
+			resources: {
+				value: function() {
+					var langs = {
+						'en': {
+							'search': 'Search',
+							'search.clear': 'Clear Search'
+						},
+						'ar': {
+							'search': 'بحث',
+							'search.clear': 'مسح البحث'
+						},
+						'es': {
+							'search': 'Buscar',
+							'search.clear': 'Borrar búsqueda'
+						},
+						'fr': {
+							'search': 'Rechercher',
+							'search.clear': 'Effacer la recherche'
+						},
+						'ja': {
+							'search': '検索',
+							'search.clear': '検索のクリア'
+						},
+						'ko': {
+							'search': '검색',
+							'search.clear': '검색 지우기'
+						},
+						'nl': {
+							'search': 'Zoeken',
+							'search.clear': 'Zoekopdracht wissen'
+						},
+						'pt': {
+							'search': 'Pesquisar',
+							'search.clear': 'Limpar Pesquisa'
+						},
+						'sv': {
+							'search': 'Sökning',
+							'search.clear': 'Rensa sökning'
+						},
+						'tr': {
+							'search': 'Ara',
+							'search.clear': 'Aramayı Temizle'
+						},
+						'zh': {
+							'search': '搜索',
+							'search.clear': '清除搜索'
+						},
+						'zh-tw': {
+							'search': '搜尋',
+							'search.clear': '清除搜尋'
+						}
+					};
+
+					return langs;
+				}
+			}
+		},
+		_computeLanguage: function(resources) {
+			var locale = document.documentElement.lang
+				|| document.documentElement.getAttribute('data-lang-default')
+				|| 'en-us';
+			locale = locale.toLowerCase();
+
+			if (resources[locale]) {
+				return locale;
+			}
+
+			var langAndRegion = locale.split('-');
+			if (resources[langAndRegion[0]]) {
+				return langAndRegion[0];
+			}
+
+			return 'en';
+		}
+	};
+
+	/** @polymerBehavior window.D2L.PolymerBehaviors.SearchWidgetBehaviorImpl */
+	var SearchWidgetBehaviorImpl = {
+		properties: {
+			// If true, responses are cached locally (cleared on page refresh)
+			cacheResponses: {
+				type: Boolean,
+				value: false
+			},
+			// Placeholder text that appears in the search field
+			placeholderText: {
+				type: String,
+				value: ''
+			},
+			// Hypermedia Entity that contains search Action
+			searchAction: {
+				type: Object,
+				observer: '_onSearchActionChanged'
+			},
+			// Name of the Hypermedia Field that typing into the search field mutates
+			searchFieldName: {
+				type: String,
+				value: 'search'
+			},
+			// The Entity returned by the search Action
+			searchResults: Object,
+			_searchResultsCache: {
+				type: Object,
+				value: {}
+			},
+			_searchUrl: {
+				type: String,
+				observer: '_onSearchUrlChanged'
+			},
+			_searchInput: {
+				type: String,
+				observer: '_onSearchInputChanged'
+			}
+		},
+		// Trigger the search manually, e.g. via an external "Search" button
+		search: function() {
+			this._isSearched = true;
+			this._setSearchUrl();
+		},
+		// Clears search text and triggers search
+		clear: function() {
+			this._isSearched = false;
+			this.set('_searchInput', '');
+			this._setSearchUrl();
+		},
+		_isSearched: false,
+		_parser: null,
+		_updateIcon: function() {
+			this._isSearched ? this._setClearIcon() : this._setSearchIcon();
+		},
+		_setClearIcon: function() {
+			this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
+			this.$$('button').setAttribute('aria-label', this.localize('search.clear'));
+		},
+		_setSearchIcon: function() {
+			this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:search');
+			this.$$('button').setAttribute('aria-label', this.localize('search'));
+		},
+		_setSearchUrl: function() {
+			if (!this._searchAction) {
+				return;
+			}
+
+			var query = {};
+			query[this.searchFieldName] = encodeURIComponent(this._searchInput);
+
+			this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
+		},
+		// Creates a URL with a query from an Action and an object of required parameters
+		_createActionUrl: function(action, parameters) {
+			parameters = parameters || {};
+			action.fields = action.fields || [];
+			var query = {};
+
+			action.fields.forEach(function(field) {
+				if (parameters.hasOwnProperty(field.name)) {
+					query[field.name] = parameters[field.name];
+				} else {
+					query[field.name] = field.value;
+				}
+			});
+
+			var queryString = Object.keys(query).map(function(key) {
+				return key + '=' + query[key];
+			}).join('&');
+
+			return queryString ? action.href + '?' + queryString : action.href;
+		},
+		_onButtonClick: function() {
+			if (this._isSearched) {
+				this.clear();
+			} else {
+				this.search();
+			}
+			this._updateIcon();
+		},
+		_onSearchActionChanged: function(searchAction) {
+			if ('string' === typeof searchAction) {
+				searchAction = JSON.parse(searchAction);
+			}
+
+			// Siren parser can only parse entities, so make a fake one with the given action
+			var entity = {
+				actions: [ searchAction ]
+			};
+			this._parser = this._parser || document.createElement('d2l-siren-parser');
+			this.set('_searchAction', this._parser.parse(entity).actions[0]);
+		},
+		_onSearchInputChanged: function(newSearchString) {
+			if (newSearchString.length === 0) {
+				return;
+			}
+			this._isSearched = false;
+			// Need to directly set search icon, as _isSearched may already be true here
+			// e.g. user types, searches, then adds a character to search string
+			this._setSearchIcon();
+		},
+		_onSearchInputKeyPressed: function(e) {
+			if (e.keyCode === 13) {
+				// If Enter key pressed, do the search
+				this.search();
+				this._updateIcon();
+			}
+		},
+		_onSearchResponse: function(e) {
+			if (e.detail.status === 200 || e.detail.status === 304) {
+				this._parser = this._parser || document.createElement('d2l-siren-parser');
+				var searchResponse = this._parser.parse(e.detail.xhr.response);
+				this.set('searchResults', searchResponse || {});
+
+				if (this.cacheResponses) {
+					this._searchResultsCache[e.detail.url] = this.searchResults;
+				}
+
+				this.fire('d2l-search-widget-results-changed', this.searchResults);
+			}
+		},
+		_onSearchUrlChanged: function(url) {
+			// Using an observer means if search button is clicked multiple times with
+			// the same query, only the first time generates a call
+			if (url) {
+				if (this.cacheResponses && this._searchResultsCache[url]) {
+					// Don't redo the call if we've done it before
+					this.set('searchResults', this._searchResultsCache[url]);
+					this.fire('d2l-search-widget-results-changed', this.searchResults);
+				} else {
+					this.$$('d2l-ajax').generateRequest();
+				}
+			}
+		}
+	};
+
+	/** @polymerBehavior */
+	window.D2L.PolymerBehaviors.SearchWidgetBehavior = [
+		Polymer.AppLocalizeBehavior,
+		LocalizeBehaviorImpl,
+		SearchWidgetBehaviorImpl
+	];
+})();
+</script>
