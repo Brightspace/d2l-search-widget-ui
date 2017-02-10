@@ -1,16 +1,21 @@
 # d2l-search-widget-ui
 
-A [Polymer](https://www.polymer-project.org/1.0/)-based web component that searches things.
+A [Polymer][polymer]-based web component that searches things via a [Siren
+Hypermedia][siren] action.
 
-## Building
+## Building and Running Locally
 
-Install dependencies via NPM:
+Install npm and bower dependencies:
 
 ```shell
 npm install
 ```
 
-## Running Locally
+Run tests:
+
+```shell
+npm test
+```
 
 To run the application locally, run the following from within the project:
 
@@ -28,6 +33,16 @@ attribute, and will perform this action whenever the search is triggered. The
 `search-field-name` attribute should be set to the name of the Siren Field that
 the search field text should correspond to. `placeholder-text` will set the
 placeholder text on the input element.
+
+Optionally, setting the `cache-responses` attribute will cache the responses
+from each search within the widget. This cache is short-lived (i.e. it is lost
+on a page refresh), but it helps in particular with the "cleared search"
+results, so that clearing the search will immediately return the results (after
+they've been fetched once).
+
+A `d2l-search-widget-results-changed` event is fired when the search completes.
+The event fires immediately if the response is cached. The event's `value` will
+contain the response, parsed with `d2l-siren-parser`.
 
 The widget will have a default height of 60px; this can be overridden with
 `--d2l-search-widget-height`.
@@ -57,6 +72,19 @@ d2l-search-widget {
 </d2l-search-widget>
 ```
 
-## Coding styles
+## Contributing
 
-See the [VUI Best Practices & Style Guide](https://github.com/Brightspace/valence-ui-docs/wiki/Best-Practices-&-Style-Guide) for information on VUI naming conventions, plus information about the [EditorConfig](http://editorconfig.org) rules used in this repo.
+1. **Fork** the repository. Committing directly against this repository is
+highly discouraged.
+
+2. Make your modifications in a branch, updating and writing new tests.
+
+3. Ensure that all tests pass.
+
+4. `rebase` your changes against master. *Do not merge*.
+
+5. Submit a pull request to this repository. Wait for tests to run and someone
+to chime in.
+
+[polymer]: https://www.polymer-project.org/1.0/
+[siren]: https://github.com/kevinswiber/siren

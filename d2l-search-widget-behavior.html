@@ -90,65 +90,32 @@
 
 	var SearchWidgetBehaviorImpl = {
 		properties: {
-			/*
-			* Fired whenever the search results change
-			*
-			* This can either occur when a search request comes back with results, or
-			* when the search field is cleared by the user. The detail of the event is
-			* the search results, which can then be parsed in the handler.
-			*
-			* @event d2l-search-widget-results-changed
-			*/
-
-			/*
-			* If true, responses are cached locally (cleared on page refresh)
-			* @type {Boolean}
-			*/
+			// If true, responses are cached locally (cleared on page refresh)
 			cacheResponses: {
 				type: Boolean,
 				value: false
 			},
-			/*
-			* Placeholder text that appears in the search field
-			* @type {String}
-			*/
+			// Placeholder text that appears in the search field
 			placeholderText: {
 				type: String,
 				value: ''
 			},
-			/*
-			* Hypermedia Entity that contains search Action
-			*/
+			// Hypermedia Entity that contains search Action
 			searchAction: {
 				type: Object,
 				observer: '_onSearchActionChanged'
 			},
-			/*
-			* Name of the Hypermedia Field that typing into the search field mutates
-			* @type {String}
-			*/
+			// Name of the Hypermedia Field that typing into the search field mutates
 			searchFieldName: {
 				type: String,
 				value: 'search'
 			},
-			/*
-			* The Entity returned by the search Action
-			* @type {Object}
-			*/
+			// The Entity returned by the search Action
 			searchResults: Object,
-			/*
-			* Search URL -> response object
-			* Rather than redoing requests, cache their results.
-			* @type {Object}
-			*/
 			_searchResultsCache: {
 				type: Object,
 				value: {}
 			},
-			/*
-			* Actual URL called for the search, generated from searchAction/FieldName
-			* @type {String}
-			*/
 			_searchUrl: {
 				type: String,
 				observer: '_onSearchUrlChanged'
@@ -158,16 +125,12 @@
 				observer: '_onSearchInputChanged'
 			}
 		},
-		/*
-		* Trigger the search manually. Useful if search needs to be triggered manually for whatever reason.
-		*/
+		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
 			this._isSearched = true;
 			this._setSearchUrl();
 		},
-		/*
-		* Clears search text and triggers search.
-		*/
+		// Clears search text and triggers search
 		clear: function() {
 			this._isSearched = false;
 			this.set('_searchInput', '');
@@ -196,11 +159,7 @@
 
 			this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 		},
-		/*
-		* Creates a URL with a query from an Action and an object of required parameters
-		* @param {Action} action
-		* @param {Object} parameters Query parameters, as { parameterName: desiredValue, ... }
-		*/
+		// Creates a URL with a query from an Action and an object of required parameters
 		_createActionUrl: function(action, parameters) {
 			parameters = parameters || {};
 			action.fields = action.fields || [];
