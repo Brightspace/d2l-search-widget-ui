@@ -70,9 +70,9 @@
 		},
 		// Clears search text and triggers search
 		clear: function() {
+			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
 			this.set('_showClearIcon', false);
-			this._setSearchUrl();
 		},
 		_parser: null,
 		_setSearchUrl: function() {
@@ -136,7 +136,9 @@
 			this.set('_searchAction', this._parser.parse(entity).actions[0]);
 		},
 		_onSearchInputChanged: function(newSearchString) {
-			if (newSearchString.length !== 0) {
+			if (newSearchString.length === 0) {
+				this._setSearchUrl();
+			} else {
 				this.set('_showClearIcon', false);
 			}
 		},

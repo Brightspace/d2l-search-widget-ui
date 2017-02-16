@@ -95,6 +95,7 @@
 						req.respond(200, {}, JSON.stringify(entity));
 					});
 
+				searchWidget._searchInput = 'foo';
 				var listener = function(e) {
 					expect(e.detail).to.be.an('object');
 					expect(e.detail.properties.name).to.equal('a-thing');
@@ -102,7 +103,6 @@
 					done();
 				};
 				document.addEventListener('d2l-search-widget-results-changed', listener);
-				searchWidget._searchInput = 'foo';
 				searchWidget.search();
 			});
 
@@ -114,6 +114,8 @@
 						req.respond(200, {}, JSON.stringify({}));
 					});
 
+				searchWidget._searchInput = 'foo';
+				searchWidget.search();
 				var listener = function(e) {
 					expect(e.detail).to.be.an('object');
 					expect(e.detail.properties).to.be.undefined;
@@ -121,7 +123,6 @@
 					done();
 				};
 				document.addEventListener('d2l-search-widget-results-changed', listener);
-				searchWidget._searchInput = 'foo';
 				searchWidget.clear();
 			});
 
@@ -170,7 +171,7 @@
 				it('should change to a search icon when cleared', function(done) {
 					server.respondWith('GET', /.*/, [200, {}, JSON.stringify({})]);
 
-					searchWidget.set('_showClearIcon', true);
+					searchWidget.search();
 					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
 
 					var listener = function() {
