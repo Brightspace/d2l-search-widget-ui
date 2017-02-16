@@ -9,6 +9,7 @@
     "test": "npm run test:lint:js && npm run test:lint:wc && wct",
     "test:lint:js": "eslint test/ --ext .js,.html && eslint *.html",
     "test:lint:wc": "polymer lint -i *.html",
+    "test:no-lint": "wct -p",
     "test:unit:local": "polymer test"
   },
   "author": "D2L Corporation",
@@ -19,6 +20,7 @@
     "eslint-config-brightspace": "^0.2.4",
     "eslint-plugin-html": "^1.5.3",
     "polymer-cli": "^0.16.0",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.5.4",
+    "web-component-tester": "^5.0.0"
   }
 }
