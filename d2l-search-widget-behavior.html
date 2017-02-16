@@ -54,32 +54,27 @@
 			_searchInput: {
 				type: String,
 				observer: '_onSearchInputChanged'
+			},
+			_showClearIcon: {
+				type: Boolean,
+				observer: '_onShowClearIconChanged'
 			}
 		},
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
-			this._isSearched = true;
+			if (this._searchInput.trim() === '') {
+				return;
+			}
+			this.set('_showClearIcon', true);
 			this._setSearchUrl();
 		},
 		// Clears search text and triggers search
 		clear: function() {
-			this._isSearched = false;
+			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
-			this._setSearchUrl();
+			this.set('_showClearIcon', false);
 		},
-		_isSearched: false,
 		_parser: null,
-		_updateIcon: function() {
-			this._isSearched ? this._setClearIcon() : this._setSearchIcon();
-		},
-		_setClearIcon: function() {
-			this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
-			this.$$('button').setAttribute('aria-label', this.clearButtonLabel);
-		},
-		_setSearchIcon: function() {
-			this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:search');
-			this.$$('button').setAttribute('aria-label', this.searchButtonLabel);
-		},
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
 				return;
@@ -111,12 +106,22 @@
 			return queryString ? action.href + '?' + queryString : action.href;
 		},
 		_onButtonClick: function() {
-			if (this._isSearched) {
+			if (this._showClearIcon) {
 				this.clear();
 			} else {
 				this.search();
 			}
-			this._updateIcon();
+		},
+		_onShowClearIconChanged: function(showClearIcon) {
+			if (showClearIcon) {
+				// Set clear icon
+				this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:close-default');
+				this.$$('button').setAttribute('aria-label', this.clearButtonLabel);
+			} else {
+				// Set search icon
+				this.$$('button > d2l-icon').setAttribute('icon', 'd2l-tier1:search');
+				this.$$('button').setAttribute('aria-label', this.searchButtonLabel);
+			}
 		},
 		_onSearchActionChanged: function(searchAction) {
 			if ('string' === typeof searchAction) {
@@ -132,18 +137,15 @@
 		},
 		_onSearchInputChanged: function(newSearchString) {
 			if (newSearchString.length === 0) {
-				return;
+				this._setSearchUrl();
+			} else {
+				this.set('_showClearIcon', false);
 			}
-			this._isSearched = false;
-			// Need to directly set search icon, as _isSearched may already be true here
-			// e.g. user types, searches, then adds a character to search string
-			this._setSearchIcon();
 		},
 		_onSearchInputKeyPressed: function(e) {
 			if (e.keyCode === 13) {
 				// If Enter key pressed, do the search
 				this.search();
-				this._updateIcon();
 			}
 		},
 		_onSearchResponse: function(e) {
