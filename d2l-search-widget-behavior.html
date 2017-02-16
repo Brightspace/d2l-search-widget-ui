@@ -62,14 +62,12 @@
 		},
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
-			this.set('_showClearIcon', true);
 			this._setSearchUrl();
 		},
 		// Clears search text and triggers search
 		clear: function() {
 			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
-			this.set('_showClearIcon', false);
 		},
 		_parser: null,
 		_setSearchUrl: function() {
@@ -159,6 +157,8 @@
 			}
 		},
 		_onSearchUrlChanged: function(url) {
+			this.set('_showClearIcon', this._searchInput.trim() !== '');
+
 			// Using an observer means if search button is clicked multiple times with
 			// the same query, only the first time generates a call
 			if (url) {
