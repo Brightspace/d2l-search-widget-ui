@@ -62,9 +62,6 @@
 		},
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
-			if (this._searchInput.trim() === '') {
-				return;
-			}
 			this.set('_showClearIcon', true);
 			this._setSearchUrl();
 		},
@@ -81,7 +78,7 @@
 			}
 
 			var query = {};
-			query[this.searchFieldName] = encodeURIComponent(this._searchInput);
+			query[this.searchFieldName] = encodeURIComponent(this._searchInput.trim());
 
 			this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 		},
