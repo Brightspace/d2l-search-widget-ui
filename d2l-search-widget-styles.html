@@ -3,7 +3,7 @@
 
 <dom-module id="d2l-search-widget-styles">
 	<template>
-		<style include="d2l-typography">
+		<style>
 			:host {
 				position: relative;
 				display: block;
@@ -11,6 +11,7 @@
 				margin: 0;
 			}
 			input {
+				font-family: inherit;
 				font-size: calc(var(--d2l-search-widget-height, 60px) / 3) !important;
 				width: 100%;
 				height: var(--d2l-search-widget-height, 60px);

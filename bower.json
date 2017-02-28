@@ -21,9 +21,12 @@
     "d2l-ajax": "^3.2.5",
     "d2l-colors": "^2.2.3",
     "d2l-siren-parser": "git://github.com/Brightspace/d2l-siren-parser-ui.git#^1.1.1",
-    "d2l-typography": "^5.2.2",
     "d2l-icons": "^3.0.0",
     "iron-input": "^1.0.10",
     "polymer": "^1.7.0"
+  },
+  "devDependencies": {
+    "d2l-demo-template": "^0.0.12",
+    "webcomponentsjs": "^0.7.24"
   }
 }
