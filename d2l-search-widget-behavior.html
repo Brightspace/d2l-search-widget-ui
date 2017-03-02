@@ -43,10 +43,6 @@
 				type: String,
 				value: 'Clear Search'
 			},
-			_searchResultsCache: {
-				type: Object,
-				value: {}
-			},
 			_searchUrl: {
 				type: String,
 				observer: '_onSearchUrlChanged'
@@ -69,7 +65,16 @@
 			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
 		},
+		// Manually clears cache
+		clearCache: function(key) {
+			if (key) {
+				delete this._searchResultsCache[key];
+			} else {
+				this._searchResultsCache = {};
+			}
+		},
 		_parser: null,
+		_searchResultsCache: {},
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
 				return;

@@ -283,6 +283,20 @@
 					searchWidgetCached._searchInput = 'bar';
 					searchWidgetCached.search();
 				});
+
+				it('should clear entire cache if no key specified', function() {
+					searchWidgetCached._searchResultsCache['foo'] = entity;
+					searchWidgetCached.clearCache();
+					expect(searchWidgetCached._searchResultsCache['foo']).to.be.undefined;
+				});
+
+				it('should clear specific cache entry if key specified', function() {
+					searchWidgetCached._searchResultsCache['foo'] = entity;
+					searchWidgetCached._searchResultsCache['bar'] = entity;
+					searchWidgetCached.clearCache('bar');
+					expect(searchWidgetCached._searchResultsCache['foo']).to.not.be.undefined;
+					expect(searchWidgetCached._searchResultsCache['bar']).to.be.undefined;
+				});
 			});
 		});
 		</script>
