@@ -42,7 +42,7 @@ they've been fetched once).
 
 A `d2l-search-widget-results-changed` event is fired when the search completes.
 The event fires immediately if the response is cached. The event's `value` will
-contain the response, parsed with `d2l-siren-parser`.
+contain the response, parsed with `node-siren-parser`.
 
 The widget will have a default height of 60px; this can be overridden with
 `--d2l-search-widget-height`.

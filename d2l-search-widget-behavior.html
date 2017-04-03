@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../d2l-siren-parser/d2l-siren-parser.html">
+<script src="https://s.brightspace.com/lib/siren-parser/6.0.0/siren-parser.js"></script>
 
 <script>
 'use strict';
@@ -73,7 +73,6 @@
 				this._searchResultsCache = {};
 			}
 		},
-		_parser: null,
 		_searchResultsCache: {},
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
@@ -132,8 +131,7 @@
 			var entity = {
 				actions: [ searchAction ]
 			};
-			this._parser = this._parser || document.createElement('d2l-siren-parser');
-			this.set('_searchAction', this._parser.parse(entity).actions[0]);
+			this.set('_searchAction', window.D2L.Hypermedia.Siren.Parse(entity).actions[0]);
 		},
 		_onSearchInputChanged: function(newSearchString) {
 			if (newSearchString.length === 0) {
@@ -150,8 +148,7 @@
 		},
 		_onSearchResponse: function(e) {
 			if (e.detail.status === 200 || e.detail.status === 304) {
-				this._parser = this._parser || document.createElement('d2l-siren-parser');
-				var searchResponse = this._parser.parse(e.detail.xhr.response);
+				var searchResponse = window.D2L.Hypermedia.Siren.Parse(e.detail.xhr.response);
 				this.set('searchResults', searchResponse || {});
 
 				if (this.cacheResponses) {
