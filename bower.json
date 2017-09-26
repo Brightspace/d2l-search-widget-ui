@@ -25,7 +25,8 @@
     "polymer": "^1.7.0"
   },
   "devDependencies": {
-    "d2l-demo-template": "^0.0.12",
-    "webcomponentsjs": "^0.7.24"
+    "d2l-demo-template": "^1.0.2",
+    "webcomponentsjs": "^0.7.24",
+    "web-component-tester": "^6.2.0"
   }
 }
