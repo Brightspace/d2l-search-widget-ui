@@ -1,12 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 <script src="https://s.brightspace.com/lib/siren-parser/6.1.0/siren-parser-global.js"></script>
 <script src="https://s.brightspace.com/lib/d2lfetch/1.2.0/d2lfetch.js"></script>
-<script src="https://s.brightspace.com/lib/d2lfetch-auth/0.6.0/d2lfetch-auth.js"></script>
-<script src="https://s.brightspace.com/lib/d2lfetch-dedupe/0.10.0/d2lfetch-dedupe.js"></script>
-<script src="https://s.brightspace.com/lib/d2lfetch-simple-cache/0.3.0/d2lfetch-simple-cache.js"></script>
 
 <script>
 'use strict';
+
+/* global Promise */
 
 (function() {
 	window.D2L = window.D2L || {};
@@ -15,11 +14,6 @@
 	/** @polymerBehavior window.D2L.PolymerBehaviors.SearchWidgetBehavior */
 	window.D2L.PolymerBehaviors.SearchWidgetBehavior = {
 		properties: {
-			// If true, responses are cached locally (cleared on page refresh)
-			cacheResponses: {
-				type: Boolean,
-				value: false
-			},
 			// Placeholder text that appears in the search field
 			placeholderText: {
 				type: String,
@@ -60,11 +54,6 @@
 				observer: '_onShowClearIconChanged'
 			}
 		},
-		ready: function() {
-			window.d2lfetch.use({name: 'auth', fn: window.d2lfetch.auth});
-			window.d2lfetch.use({name: 'dedupe', fn: window.d2lfetch.dedupe});
-			window.d2lfetch.use({name: 'simpleCache', fn: window.d2lfetch.simpleCache});
-		},
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
 			this._setSearchUrl();
@@ -74,15 +63,6 @@
 			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
 		},
-		// Manually clears cache
-		clearCache: function(key) {
-			if (key) {
-				delete this._searchResultsCache[key];
-			} else {
-				this._searchResultsCache = {};
-			}
-		},
-		_searchResultsCache: {},
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
 				return;
@@ -157,11 +137,6 @@
 		},
 		_onSearchResponse: function(searchResponse) {
 			this.set('searchResults', searchResponse || {});
-
-			if (this.cacheResponses) {
-				this._searchResultsCache[e.detail.url] = this.searchResults;
-			}
-
 			this.fire('d2l-search-widget-results-changed', this.searchResults);
 		},
 		_onSearchUrlChanged: function(url) {
@@ -169,28 +144,18 @@
 
 			// Using an observer means if search button is clicked multiple times with
 			// the same query, only the first time generates a call
-			if (url) {
-				if (this.cacheResponses && this._searchResultsCache[url]) {
-					// Don't redo the call if we've done it before
-					this.set('searchResults', this._searchResultsCache[url]);
-					this.fire('d2l-search-widget-results-changed', this.searchResults);
-				} else {
-					window.d2lfetch
-						.fetch(new Request(url, {
-							headers: {
-								'accept': 'application/vnd.siren+json'
-							}
-						}))
-						.then(function(response) {
-							if (response.ok) {
-								return response.json();
-							}
-							return Promise.reject(response.status + ' ' + response.statusText);
-						})
-						.then(window.D2L.Hypermedia.Siren.Parse)
-						.then(this._onSearchResponse.bind(this));
-				}
-			}
+			return window.d2lfetch
+				.fetch(new Request(url, {
+					headers: { Accept: 'application/vnd.siren+json' }
+				}))
+				.then(function(response) {
+					if (response.ok) {
+						return response.json();
+					}
+					return Promise.reject(response.status + ' ' + response.statusText);
+				})
+				.then(window.D2L.Hypermedia.Siren.Parse)
+				.then(this._onSearchResponse.bind(this));
 		}
 	};
 })();

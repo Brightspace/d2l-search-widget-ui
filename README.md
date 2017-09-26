@@ -28,9 +28,9 @@ This will start a local server using `polymer-cli` which you can use to explore 
 
 The `d2l-search-widget` takes a Siren Hypermedia action as a `search-action` attribute, and will perform this action whenever the search is triggered. The `search-field-name` attribute should be set to the name of the Siren Field that the search field text should correspond to. `placeholder-text` will set the placeholder text on the input element.
 
-Optionally, setting the `cache-responses` attribute will cache the responses from each search within the widget. This cache is short-lived (i.e. it is lost on a page refresh), but it helps in particular with the "cleared search" results, so that clearing the search will immediately return the results (after they've been fetched once).
+`d2l-search-widget` uses [`d2l-fetch`][d2lfetch] to actually fetch data. When using the `d2l-search-widget`, we strongly recommend also using the [`d2l-simple-cache`][d2lfetchsimplecache] and [`d2l-auth`][d2lfetchauth] middlewares for this as well, and `use` them in your app.
 
-A `d2l-search-widget-results-changed` event is fired when the search completes. The event fires immediately if the response is cached. The event's `value` will contain the response, parsed with `node-siren-parser`.
+A `d2l-search-widget-results-changed` event is fired when the search completes. The event's `value` will contain the response, parsed with `node-siren-parser`.
 
 The widget will have a default height of 60px; this can be overridden with `--d2l-search-widget-height`.
 
@@ -71,5 +71,8 @@ d2l-search-widget {
 
 5. Submit a pull request to this repository. Wait for tests to run and someone to chime in.
 
-[polymer]: https://www.polymer-project.org/1.0/
+[polymer]: https://www.polymer-project.org/
 [siren]: https://github.com/kevinswiber/siren
+[d2lfetch]: https://github.com/Brightspace/d2l-fetch
+[d2lfetchsimplecache]: https://github.com/Brightspace/d2l-fetch-simple-cache
+[d2lfetchauth]: https://github.com/Brightspace/d2l-fetch-auth
