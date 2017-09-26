@@ -1,5 +1,4 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../d2l-ajax/d2l-ajax.html">
 <link rel="import" href="../d2l-icons/d2l-icons.html">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="localize-behavior.html">
@@ -9,12 +8,6 @@
 <dom-module id="d2l-search-widget">
 	<template>
 		<style include="d2l-search-widget-styles"></style>
-
-		<d2l-ajax
-			url="[[_searchUrl]]"
-			headers='{ "Accept": "application/vnd.siren+json" }'
-			on-iron-ajax-response="_onSearchResponse">
-		</d2l-ajax>
 
 		<input
 			is="iron-input"

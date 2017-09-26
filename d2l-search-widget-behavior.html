@@ -1,5 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
 <script src="https://s.brightspace.com/lib/siren-parser/6.1.0/siren-parser-global.js"></script>
+<script src="https://s.brightspace.com/lib/d2lfetch/1.2.0/d2lfetch.js"></script>
+<script src="https://s.brightspace.com/lib/d2lfetch-auth/0.6.0/d2lfetch-auth.js"></script>
+<script src="https://s.brightspace.com/lib/d2lfetch-dedupe/0.10.0/d2lfetch-dedupe.js"></script>
+<script src="https://s.brightspace.com/lib/d2lfetch-simple-cache/0.3.0/d2lfetch-simple-cache.js"></script>
 
 <script>
 'use strict';
@@ -55,6 +59,11 @@
 				type: Boolean,
 				observer: '_onShowClearIconChanged'
 			}
+		},
+		ready: function() {
+			window.d2lfetch.use({name: 'auth', fn: window.d2lfetch.auth});
+			window.d2lfetch.use({name: 'dedupe', fn: window.d2lfetch.dedupe});
+			window.d2lfetch.use({name: 'simpleCache', fn: window.d2lfetch.simpleCache});
 		},
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
@@ -146,17 +155,14 @@
 				this.search();
 			}
 		},
-		_onSearchResponse: function(e) {
-			if (e.detail.status === 200 || e.detail.status === 304) {
-				var searchResponse = window.D2L.Hypermedia.Siren.Parse(e.detail.xhr.response);
-				this.set('searchResults', searchResponse || {});
+		_onSearchResponse: function(searchResponse) {
+			this.set('searchResults', searchResponse || {});
 
-				if (this.cacheResponses) {
-					this._searchResultsCache[e.detail.url] = this.searchResults;
-				}
-
-				this.fire('d2l-search-widget-results-changed', this.searchResults);
+			if (this.cacheResponses) {
+				this._searchResultsCache[e.detail.url] = this.searchResults;
 			}
+
+			this.fire('d2l-search-widget-results-changed', this.searchResults);
 		},
 		_onSearchUrlChanged: function(url) {
 			this.set('_showClearIcon', this._searchInput.trim() !== '');
@@ -169,7 +175,20 @@
 					this.set('searchResults', this._searchResultsCache[url]);
 					this.fire('d2l-search-widget-results-changed', this.searchResults);
 				} else {
-					this.$$('d2l-ajax').generateRequest();
+					window.d2lfetch
+						.fetch(new Request(url, {
+							headers: {
+								'accept': 'application/vnd.siren+json'
+							}
+						}))
+						.then(function(response) {
+							if (response.ok) {
+								return response.json();
+							}
+							return Promise.reject(response.status + ' ' + response.statusText);
+						})
+						.then(window.D2L.Hypermedia.Siren.Parse)
+						.then(this._onSearchResponse.bind(this));
 				}
 			}
 		}
