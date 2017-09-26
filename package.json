@@ -5,21 +5,22 @@
     "prebuild": "rimraf dist && mkdir dist",
     "build": "cp d2l-*.html ./dist/",
     "postinstall": "bower install",
-    "serve": "polymer serve",
     "test": "npm run test:lint && wct",
-    "test:lint": "eslint test/ --ext .js,.html && eslint *.html",
-    "test:no-lint": "wct -p",
+    "test:lint:js": "eslint --ext .js,.html . test/ demo/",
+    "test:lint:wc": "polymer lint",
+    "test:no-lint": "cross-env LAUNCHPAD_BROWSERS=firefox wct -p",
     "test:unit:local": "polymer test"
   },
   "author": "D2L Corporation",
   "license": "Apache-2.0",
   "devDependencies": {
     "bower": "^1.7.9",
-    "eslint": "^3.7.1",
-    "eslint-config-brightspace": "^0.2.4",
-    "eslint-plugin-html": "^1.5.3",
-    "polymer-cli": "^0.16.0",
+    "cross-env": "^5.0.5",
+    "eslint": "^4.7.2",
+    "eslint-config-brightspace": "^0.4.0",
+    "eslint-plugin-html": "^3.2.2",
+    "polymer-cli": "^1.5.5",
     "rimraf": "^2.5.4",
-    "web-component-tester": "^5.0.0"
+    "web-component-tester": "^6.2.0"
   }
 }

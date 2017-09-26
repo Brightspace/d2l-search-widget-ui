@@ -7,8 +7,8 @@
 	window.D2L = window.D2L || {};
 	window.D2L.SearchWidget = window.D2L.SearchWidget || {};
 
-	/** @polymerBehavior D2L.PolymerBehaviors.SearchWidget.LocalizeBehavior */
-	window.D2L.SearchWidget.LocalizeBehaviorImpl = {
+	/** @polymerBehavior window.D2L.SearchWidget.LocalizeBehavior */
+	var localizeBehaviorImpl = {
 		properties: {
 			language: {
 				type: String,
@@ -86,10 +86,9 @@
 		}
 	};
 
-	/** @polymerBehavior */
 	window.D2L.SearchWidget.LocalizeBehavior = [
 		Polymer.AppLocalizeBehavior,
-		window.D2L.SearchWidget.LocalizeBehaviorImpl
+		localizeBehaviorImpl
 	];
 })();
 </script>
