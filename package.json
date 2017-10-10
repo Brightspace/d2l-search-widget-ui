@@ -5,10 +5,10 @@
     "prebuild": "rimraf dist && mkdir dist",
     "build": "cp d2l-*.html ./dist/",
     "postinstall": "bower install",
-    "test": "npm run test:lint && wct",
+    "test": "npm run test:lint:js && && npm run test:lint:wc && wct",
     "test:lint:js": "eslint --ext .js,.html . test/ demo/",
     "test:lint:wc": "polymer lint",
-    "test:no-lint": "cross-env LAUNCHPAD_BROWSERS=firefox wct -p",
+    "test:no-lint": "cross-env LAUNCHPAD_BROWSERS=chrome wct -p",
     "test:unit:local": "polymer test"
   },
   "author": "D2L Corporation",
