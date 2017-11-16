@@ -1,25 +1,24 @@
-<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../d2l-localize-behavior/d2l-localize-behavior.html">
 <script>
 	window.D2L = window.D2L || {};
-	window.D2L.SearchWidget = window.D2L.SearchWidget || {};
+	window.D2L.PolymerBehaviors = window.D2L.PolymerBehaviors || {};
+	window.D2L.PolymerBehaviors.SearchWidget = window.D2L.PolymerBehaviors.SearchWidget || {};
 
-	/** @polymerBehavior window.D2L.SearchWidget.LocalizeBehavior */
-	var localizeBehaviorImpl = {
+	/*
+	* @polymerBehavior D2L.PolymerBehaviors.SearchWidget.LocalizeBehaviorImpl
+	*/
+	D2L.PolymerBehaviors.SearchWidget.LocalizeBehaviorImpl = {
 		properties: {
-			language: {
-				type: String,
-				computed: '_computeLanguage(resources)'
-			},
 			resources: {
 				value: function() {
-					var langs = {
-						'en': {
-							'search': 'Search',
-							'search.clear': 'Clear Search'
-						},
+					return {
 						'ar': {
 							'search': 'بحث',
 							'search.clear': 'مسح البحث'
+						},
+						'en': {
+							'search': 'Search',
+							'search.clear': 'Clear Search'
 						},
 						'es': {
 							'search': 'Buscar',
@@ -62,28 +61,14 @@
 							'search.clear': '清除搜尋'
 						}
 					};
-					return langs;
 				}
 			}
-		},
-		_computeLanguage: function(resources) {
-			var locale = document.documentElement.lang
-				|| document.documentElement.getAttribute('data-lang-default')
-				|| 'en-us';
-			locale = locale.toLowerCase();
-			if (resources[locale]) {
-				return locale;
-			}
-			var langAndRegion = locale.split('-');
-			if (resources[langAndRegion[0]]) {
-				return langAndRegion[0];
-			}
-			return 'en';
 		}
 	};
 
-	window.D2L.SearchWidget.LocalizeBehavior = [
-		Polymer.AppLocalizeBehavior,
-		localizeBehaviorImpl
+	/* @polymerBehavior */
+	D2L.PolymerBehaviors.SearchWidget.LocalizeBehavior = [
+		D2L.PolymerBehaviors.LocalizeBehavior,
+		D2L.PolymerBehaviors.SearchWidget.LocalizeBehaviorImpl
 	];
 </script>
