@@ -18,15 +18,14 @@
   ],
   "dependencies": {
     "app-localize-behavior": "PolymerElements/app-localize-behavior#^1.0.2",
-    "d2l-colors": "^2.3.0",
-    "d2l-icons": "^3.2.0",
-    "iron-input": "^1.0.10",
-    "polymer": "^1.7.0",
-    "d2l-fetch": "Brightspace/d2l-fetch#^1.5.1"
+    "d2l-colors": "^2.4.0",
+    "d2l-fetch": "Brightspace/d2l-fetch#^1.7.0",
+    "d2l-icons": "^3.7.0",
+    "iron-input": "^1.0.11",
+    "polymer": "^1.11.0"
   },
   "devDependencies": {
     "d2l-demo-template": "^1.0.2",
-    "webcomponentsjs": "^0.7.24",
-    "web-component-tester": "^6.2.0"
+    "web-component-tester": "^6.4.0"
   }
 }
