@@ -1,6 +1,6 @@
 {
   "name": "d2l-search-widget",
-  "description": "A Polymer-based web component that searches things.",
+  "description": "Polymer-based web component that searches things.",
   "author": "D2L Corporation",
   "license": "Apache-2.0",
   "main": "d2l-search-widget.html",
