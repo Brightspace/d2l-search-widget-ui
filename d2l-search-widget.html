@@ -5,17 +5,24 @@
 <link rel="import" href="localize-behavior.html">
 <link rel="import" href="d2l-search-widget-behavior.html">
 <link rel="import" href="d2l-search-widget-styles.html">
+
+<!--
+`d2l-search-widget`
+Polymer-based web component that searches things.
+
+@demo demo/index.html
+-->
+
 <dom-module id="d2l-search-widget">
 	<template>
 		<style include="d2l-search-widget-styles"></style>
-		<input
-			is="iron-input"
-			bind-value="{{_searchInput}}"
-			placeholder="{{placeholderText}}"
-			on-keydown="_onSearchInputKeyPressed">
-		</input>
-		<button
-			type="button"
+		<iron-input bind-value="{{_searchInput}}">
+			<input value="{{_searchInput}}"
+				placeholder="[[placeholderText]]"
+				on-keydown="_onSearchInputKeyPressed">
+			</input>
+		</iron-input>
+		<button type="button"
 			on-tap="_onButtonClick"
 			aria-label$="[[searchButtonLabel]]">
 			<d2l-icon icon="d2l-tier1:search"></d2l-icon>

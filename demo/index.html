@@ -1,90 +1,87 @@
 <!doctype html>
-<html lang="en-ca">
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 		<title>d2l-search-widget demo</title>
 		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-		<link rel="import" href="../../d2l-demo-template/d2l-demo-template.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+		<link rel="import" href="../../d2l-typography/d2l-typography.html">
 		<link rel="import" href="../d2l-search-widget.html">
-		<style is="custom-style" include="d2l-search-widget">
+		<custom-style>
+			<style is="custom-style" include="demo-pages-shared-styles"></style>
+		</custom-style>
+		<custom-style include="d2l-typography">
+			<style is="custom-style" include="d2l-typography"></style>
+		</custom-style>
+		<style>
+			html {
+				font-size: 20px;
+			}
 			.small {
 				--d2l-search-widget-height: 40px;
 			}
-		</style>
+			</style>
 	</head>
-	<body unresolved>
-		<d2l-demo-template title="d2l-search-widget">
-			<div slot="d2l-demo-fixture">
+	<body unresolved class="d2l-typography">
+		<div class="vertical-section-container centered">
 
-				<script>
-					function search() { // eslint-disable-line no-unused-vars
-						var widget = document.getElementById('manual-search');
-						widget.search();
-					}
-				</script>
+			<h3>Normal search</h3>
+			<demo-snippet>
+				<template>
+					<d2l-search-widget
+						placeholder-text="Type and hit Enter or click icon to search!"
+						search-button-label="ARIA Search label"
+						clear-button-label="ARIA Clear label"
+						search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
+						search-field-name="search"></d2l-search-widget>
+					<p>Result:
+						<ul id="result"></ul>
+					</p>
+				</template>
+			</demo-snippet>
 
-				<h3>Normal search</h3>
-				<d2l-search-widget
-					id="widget"
-					placeholder-text="Type and hit Enter or click icon to search!"
-					search-button-label="ARIA Search label"
-					clear-button-label="ARIA Clear label"
-					search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
-					search-field-name="search"></d2l-search-widget>
-				<p>
-					Result:
-					<ul id="result">
-					</ul>
-				</p>
+			<h3>Search via external button</h3>
+			<demo-snippet>
+				<template>
+					<d2l-search-widget id="manual-search"
+						placeholder-text="Type and hit Enter, click icon, or click Go to search!"
+						search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
+						search-field-name="search"></d2l-search-widget>
+					<button onclick="search()">Go!</button>
+					<p>Result:
+						<ul id="result"></ul>
+					</p>
+				</template>
+			</demo-snippet>
 
-				<h3>Search via external button</h3>
-				<d2l-search-widget
-					id="manual-search"
-					placeholder-text="Type and hit Enter, click icon, or click Go to search!"
-					search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
-					search-field-name="search"></d2l-search-widget>
-				<button onclick="search()">Go!</button>
-				<p>
-					Result:
-					<ul id="manual-search-result">
-					</ul>
-				</p>
+			<h3>Small widget</h3>
+			<demo-snippet>
+				<template>
+					<d2l-search-widget
+						placeholder-text="I'm a small search field"
+						class="small"
+						search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
+						search-field-name="search"></d2l-search-widget>
+					<p>Result:
+						<ul id="result"></ul>
+					</p>
+				</template>
+			</demo-snippet>
 
-				<h3>Small widget</h3>
-				<d2l-search-widget
-					id="small-search"
-					placeholder-text="I'm a small search field"
-					class="small"
-					search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
-					search-field-name="search"></d2l-search-widget>
-				<p>
-					Result:
-					<ul id="small-search-result">
-					</ul>
-				</p>
-
-				<script>
-					document.getElementById('widget').addEventListener('d2l-search-widget-results-changed', function(e) {
-						var ul = document.getElementById('result');
-						var li = document.createElement('li');
-						li.innerHTML = e.detail.properties.name;
-						ul.appendChild(li);
-					});
-					document.getElementById('manual-search').addEventListener('d2l-search-widget-results-changed', function(e) {
-						var ul = document.getElementById('manual-search-result');
-						var li = document.createElement('li');
-						li.innerHTML = e.detail.properties.name;
-						ul.appendChild(li);
-					});
-					document.getElementById('small-search').addEventListener('d2l-search-widget-results-changed', function(e) {
-						var ul = document.getElementById('small-search-result');
-						var li = document.createElement('li');
-						li.innerHTML = e.detail.properties.name;
-						ul.appendChild(li);
-					});
-				</script>
-			</div>
-		</d2l-demo-template>
+		</div>
+		<script>
+			function search() {
+				var widget = document.getElementById('manual-search');
+				widget.search();
+			}
+			document.body.addEventListener('d2l-search-widget-results-changed', function(e) {
+				var results = e.target.parentNode.querySelector('#result');
+				var result = document.createElement('li');
+				result.innerHTML = e.detail.properties.name;
+				results.appendChild(result);
+			});
+		</script>
 	</body>
 </html>
