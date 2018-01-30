@@ -60,13 +60,17 @@
 			this.set('_searchInput', '');
 		},
 
+		_getSearchInput: function() {
+			return (this._searchInput ? this._searchInput.trim() : '');
+		},
+
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
 				return;
 			}
 
 			var query = {};
-			query[this.searchFieldName] = encodeURIComponent(this._searchInput.trim());
+			query[this.searchFieldName] = encodeURIComponent(this._getSearchInput());
 
 			this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 		},
@@ -145,7 +149,7 @@
 		},
 
 		_onSearchUrlChanged: function(url) {
-			this.set('_showClearIcon', this._searchInput.trim() !== '');
+			this.set('_showClearIcon', this._getSearchInput() !== '');
 
 			// Using an observer means if search button is clicked multiple times with
 			// the same query, only the first time generates a call
