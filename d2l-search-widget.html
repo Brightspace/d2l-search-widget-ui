@@ -17,7 +17,7 @@ Polymer-based web component that searches things.
 	<template>
 		<style include="d2l-search-widget-styles"></style>
 		<iron-input bind-value="{{_searchInput}}">
-			<input value="{{value::input}}"
+			<input value="{{_searchInput}}"
 				placeholder="[[placeholderText]]"
 				on-keydown="_onSearchInputKeyPressed">
 			</input>
