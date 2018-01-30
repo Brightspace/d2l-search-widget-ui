@@ -10,13 +10,6 @@
 		<link rel="import" href="../../d2l-typography/d2l-typography.html">
 		<link rel="import" href="../d2l-search-widget.html">
 		<custom-style>
-			<style is="custom-style" include="d2l-search-widget">
-				.small {
-					--d2l-search-widget-height: 40px;
-				}
-			</style>
-		</custom-style>
-		<custom-style>
 			<style is="custom-style" include="demo-pages-shared-styles"></style>
 		</custom-style>
 		<custom-style include="d2l-typography">
@@ -26,6 +19,9 @@
 			html {
 				font-size: 20px;
 			}
+			.small {
+				--d2l-search-widget-height: 40px;
+			}
 			</style>
 	</head>
 	<body unresolved class="d2l-typography">
@@ -34,7 +30,7 @@
 			<h3>Normal search</h3>
 			<demo-snippet>
 				<template>
-					<d2l-search-widget id="widget"
+					<d2l-search-widget
 						placeholder-text="Type and hit Enter or click icon to search!"
 						search-button-label="ARIA Search label"
 						clear-button-label="ARIA Clear label"
@@ -49,13 +45,13 @@
 			<h3>Search via external button</h3>
 			<demo-snippet>
 				<template>
-					<d2l-search-widget id="manual-search"
+					<d2l-search-widget
 						placeholder-text="Type and hit Enter, click icon, or click Go to search!"
 						search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
 						search-field-name="search"></d2l-search-widget>
 					<button onclick="search()">Go!</button>
 					<p>Result:
-						<ul id="manual-search-result"></ul>
+						<ul id="result"></ul>
 					</p>
 				</template>
 			</demo-snippet>
@@ -63,46 +59,29 @@
 			<h3>Small widget</h3>
 			<demo-snippet>
 				<template>
-					<d2l-search-widget id="small-search"
+					<d2l-search-widget
 						placeholder-text="I'm a small search field"
 						class="small"
 						search-action='{"name":"search-course-collection","method":"GET","href":"/components/d2l-search-widget/demo/response.json","fields":[{"name":"search","type":"search","value":""}]}'
 						search-field-name="search"></d2l-search-widget>
 					<p>Result:
-						<ul id="small-search-result"></ul>
+						<ul id="result"></ul>
 					</p>
 				</template>
 			</demo-snippet>
 
 		</div>
 		<script>
-			function search() { // eslint-disable-line no-unused-vars
+			function search() {
 				var widget = document.getElementById('manual-search');
 				widget.search();
 			}
 			document.body.addEventListener('d2l-search-widget-results-changed', function(e) {
-				console.log(e.target);
+				var results = e.target.parentNode.querySelector('#result');
+				var result = document.createElement('li');
+				result.innerHTML = e.detail.properties.name;
+				results.appendChild(result);
 			});
-			/*
-			document.getElementById('widget').addEventListener('d2l-search-widget-results-changed', function(e) {
-				var ul = document.getElementById('result');
-				var li = document.createElement('li');
-				li.innerHTML = e.detail.properties.name;
-				ul.appendChild(li);
-			});
-			document.getElementById('manual-search').addEventListener('d2l-search-widget-results-changed', function(e) {
-				var ul = document.getElementById('manual-search-result');
-				var li = document.createElement('li');
-				li.innerHTML = e.detail.properties.name;
-				ul.appendChild(li);
-			});
-			document.getElementById('small-search').addEventListener('d2l-search-widget-results-changed', function(e) {
-				var ul = document.getElementById('small-search-result');
-				var li = document.createElement('li');
-				li.innerHTML = e.detail.properties.name;
-				ul.appendChild(li);
-			});
-			*/
 		</script>
 	</body>
 </html>
