@@ -4,8 +4,9 @@
 	window.D2L = window.D2L || {};
 	window.D2L.PolymerBehaviors = window.D2L.PolymerBehaviors || {};
 
-	/** @polymerBehavior D2L.PolymerBehaviors.SearchWidgetBehavior*/
+	/** @polymerBehavior */
 	D2L.PolymerBehaviors.SearchWidgetBehavior = {
+
 		properties: {
 			// Placeholder text that appears in the search field
 			placeholderText: {
@@ -47,15 +48,18 @@
 				observer: '_onShowClearIconChanged'
 			}
 		},
+
 		// Trigger the search manually, e.g. via an external "Search" button
 		search: function() {
 			this._setSearchUrl();
 		},
+
 		// Clears search text and triggers search
 		clear: function() {
 			// Triggers _onSearchInputChanged to call _setSearchUrl with empty query
 			this.set('_searchInput', '');
 		},
+
 		_setSearchUrl: function() {
 			if (!this._searchAction) {
 				return;
@@ -66,6 +70,7 @@
 
 			this.set('_searchUrl', this._createActionUrl(this._searchAction, query));
 		},
+
 		// Creates a URL with a query from an Action and an object of required parameters
 		_createActionUrl: function(action, parameters) {
 			parameters = parameters || {};
@@ -86,6 +91,7 @@
 
 			return queryString ? action.href + '?' + queryString : action.href;
 		},
+
 		_onButtonClick: function() {
 			if (this._showClearIcon) {
 				this.clear();
@@ -93,6 +99,7 @@
 				this.search();
 			}
 		},
+
 		_onShowClearIconChanged: function(showClearIcon) {
 			if (showClearIcon) {
 				// Set clear icon
@@ -104,6 +111,7 @@
 				this.$$('button').setAttribute('aria-label', this.searchButtonLabel);
 			}
 		},
+
 		_onSearchActionChanged: function(searchAction) {
 			if ('string' === typeof searchAction) {
 				searchAction = JSON.parse(searchAction);
@@ -115,6 +123,7 @@
 			};
 			this.set('_searchAction', window.D2L.Hypermedia.Siren.Parse(entity).actions[0]);
 		},
+
 		_onSearchInputChanged: function(newSearchString) {
 			if (newSearchString.length === 0) {
 				this._setSearchUrl();
@@ -122,16 +131,19 @@
 				this.set('_showClearIcon', false);
 			}
 		},
+
 		_onSearchInputKeyPressed: function(e) {
 			if (e.keyCode === 13) {
 				// If Enter key pressed, do the search
 				this.search();
 			}
 		},
+
 		_onSearchResponse: function(searchResponse) {
 			this.set('searchResults', searchResponse || {});
 			this.fire('d2l-search-widget-results-changed', this.searchResults);
 		},
+
 		_onSearchUrlChanged: function(url) {
 			this.set('_showClearIcon', this._searchInput.trim() !== '');
 
@@ -150,5 +162,7 @@
 				.then(window.D2L.Hypermedia.Siren.Parse)
 				.then(this._onSearchResponse.bind(this));
 		}
+
 	};
+
 </script>
