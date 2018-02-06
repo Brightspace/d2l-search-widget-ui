@@ -22,13 +22,15 @@
     "d2l-icons": "^3.7.0",
     "d2l-localize-behavior": "^1.0.1",
     "iron-input": "^1.0.11",
-    "polymer": "^1.11.0"
+    "polymer": "^1.11.0",
+    "siren-parser-import": "Brightspace/siren-parser-import#^6.5.0"
   },
   "devDependencies": {
     "d2l-demo-template": "^1.0.2",
     "web-component-tester": "^6.4.0"
   },
   "resolutions": {
-    "webcomponentsjs": "^0.7.24"
+    "webcomponentsjs": "^0.7.24",
+    "d2l-colors": "^2.3.0 || ^3.0.0"
   }
 }
