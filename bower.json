@@ -23,7 +23,7 @@
     "d2l-localize-behavior": "^1.0.1",
     "iron-input": "^2.0.1",
     "polymer": "1 - 2",
-    "siren-parser-import": "Brightspace/siren-parser-import#^6.5.0"
+    "siren-parser-import": "Brightspace/siren-parser-import#^7.0.0"
   },
   "devDependencies": {
     "d2l-typography": "^6.0.0",
