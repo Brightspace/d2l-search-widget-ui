@@ -78,6 +78,13 @@
 				expect(searchWidget.searchFieldName).to.equal('query');
 			});
 
+			it('should set the search input to be the passed-in search field value, if applicable', function() {
+				entity.actions[0].fields[0].value = 'foo';
+				searchWidgetBasic.searchFieldName = 'query';
+				searchWidgetBasic.searchAction = entity.actions[0];
+				expect(searchWidgetBasic._searchInput).to.equal('foo');
+			});
+
 			it('should fire a d2l-search-widget-results-changed event when search completes', function(done) {
 				searchWidget._searchInput = 'foo';
 				var listener = function(e) {
@@ -122,6 +129,15 @@
 				it('should default to a search icon and correct ARIA label', function() {
 					expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
 					expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
+				});
+
+				it('should change to an X icon when a non-empty search query is passed in', function() {
+					entity.actions[0].fields[0].value = 'foo';
+					searchWidgetBasic.searchFieldName = 'query';
+					searchWidgetBasic.searchAction = entity.actions[0];
+					expect(searchWidgetBasic._showClearIcon).to.be.true;
+					expect(searchWidgetBasic.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
+					expect(searchWidgetBasic.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
 				});
 
 				it('should change to an X icon when a search is done', function(done) {

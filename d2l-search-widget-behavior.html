@@ -123,10 +123,18 @@
 			}
 
 			// Siren parser can only parse entities, so make a fake one with the given action
-			var entity = {
+			var entity = window.D2L.Hypermedia.Siren.Parse({
 				actions: [ searchAction ]
-			};
-			this.set('_searchAction', window.D2L.Hypermedia.Siren.Parse(entity).actions[0]);
+			});
+			var parsedSearchAction = entity.actions[0];
+			this.set('_searchAction', parsedSearchAction);
+
+			var searchField = parsedSearchAction.getFieldByName(this.searchFieldName);
+			if (searchField && searchField.value) {
+				this.set('_searchInput', searchField.value);
+				// If we've applied a search, by default we want to show the clear button
+				this.set('_showClearIcon', true);
+			}
 		},
 
 		_onSearchInputChanged: function(newSearchString) {
