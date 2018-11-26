@@ -8,13 +8,13 @@
 		<link rel="import" href="../d2l-search-widget.html">
 	</head>
 	<body>
-		<test-fixture id="search-widget-basic">
+		<test-fixture id="SearchWidgetBasic">
 			<template>
 				<d2l-search-widget></d2l-search-widget>
 			</template>
 		</test-fixture>
 
-		<test-fixture id="search-widget">
+		<test-fixture id="SearchWidget">
 			<template>
 				<d2l-search-widget
 					search-action='{"name": "do-a-thing", "method": "GET", "href": "/some/url", "fields": [{"name": "query", "type": "search", "value": ""}]}'
@@ -45,8 +45,8 @@
 				};
 
 			beforeEach(function() {
-				searchWidget = fixture('search-widget');
-				searchWidgetBasic = fixture('search-widget-basic');
+				searchWidget = fixture('SearchWidget');
+				searchWidgetBasic = fixture('SearchWidgetBasic');
 				sandbox = sinon.sandbox.create();
 
 				window.d2lfetch.fetch = sandbox.stub().returns(Promise.resolve({
