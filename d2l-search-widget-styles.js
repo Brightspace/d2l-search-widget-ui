@@ -1,7 +1,8 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../d2l-colors/d2l-colors.html">
+import '../@polymer/polymer/polymer-legacy.js';
+import '../d2l-colors/d2l-colors.js';
+const $_documentContainer = document.createElement('template');
 
-<dom-module id="d2l-search-widget-styles">
+$_documentContainer.innerHTML = `<dom-module id="d2l-search-widget-styles">
 	<template>
 		<style>
 
@@ -72,4 +73,6 @@
 
 		</style>
 	</template>
-</dom-module>
+</dom-module>`;
+
+document.head.appendChild($_documentContainer.content);
