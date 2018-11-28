@@ -1,5 +1,5 @@
 import '../@polymer/polymer/polymer-legacy.js';
-import '../siren-parser/siren-parser.js';
+import SirenParse from 'siren-parser';
 window.D2L = window.D2L || {};
 window.D2L.PolymerBehaviors = window.D2L.PolymerBehaviors || {};
 
@@ -121,7 +121,7 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 		}
 
 		// Siren parser can only parse entities, so make a fake one with the given action
-		var entity = window.D2L.Hypermedia.Siren.Parse({
+		var entity = SirenParse({
 			actions: [ searchAction ]
 		});
 		var parsedSearchAction = entity.actions[0];
@@ -170,7 +170,7 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 				}
 				return Promise.reject(response.status + ' ' + response.statusText);
 			})
-			.then(window.D2L.Hypermedia.Siren.Parse)
+			.then(SirenParse)
 			.then(this._onSearchResponse.bind(this));
 	}
 
