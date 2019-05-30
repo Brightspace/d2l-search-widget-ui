@@ -121,7 +121,6 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 		if (searchField && searchField.value) {
 			const searchInput = this._getSearchInput();
 			searchInput.value = searchField.value;
-			//searchInput.search();
 		}
 	},
 
