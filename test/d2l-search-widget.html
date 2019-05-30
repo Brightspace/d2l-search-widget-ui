@@ -24,169 +24,120 @@
 		</test-fixture>
 
 		<script type="module">
-import '../d2l-search-widget.js';
-describe('d2l-search-widget', function() {
-	var searchWidget,
-		searchWidgetBasic,
-		sandbox,
-		entity = {
-			class: ['foo'],
-			properties: {
-				name: 'a-thing'
-			},
-			actions: [{
-				name: 'do-a-thing',
-				method: 'GET',
-				href: '/some/url',
-				fields: [{
-					name: 'query',
-					type: 'search',
-					value: ''
-				}]
-			}]
-		};
+			import '../d2l-search-widget.js';
+			describe('d2l-search-widget', function() {
+				var searchWidget,
+					searchWidgetInput,
+					searchWidgetBasic,
+					searchWidgetBasicInput,
+					sandbox,
+					entity = {
+						class: ['foo'],
+						properties: {
+							name: 'a-thing'
+						},
+						actions: [{
+							name: 'do-a-thing',
+							method: 'GET',
+							href: '/some/url',
+							fields: [{
+								name: 'query',
+								type: 'search',
+								value: ''
+							}]
+						}]
+					};
 
-	beforeEach(function() {
-		searchWidget = fixture('SearchWidget');
-		searchWidgetBasic = fixture('SearchWidgetBasic');
-		sandbox = sinon.sandbox.create();
+				beforeEach(function() {
+					searchWidget = fixture('SearchWidget');
+					searchWidgetInput = searchWidget.shadowRoot.querySelector('d2l-input-search');
+					searchWidgetBasic = fixture('SearchWidgetBasic');
+					searchWidgetBasicInput = searchWidgetBasic.shadowRoot.querySelector('d2l-input-search');
+					sandbox = sinon.sandbox.create();
 
-		window.d2lfetch.fetch = sandbox.stub().returns(Promise.resolve({
-			ok: true,
-			json: function() {
-				return entity;
-			}
-		}));
-	});
+					window.d2lfetch.fetch = sandbox.stub().returns(Promise.resolve({
+						ok: true,
+						json: function() {
+							return entity;
+						}
+					}));
+				});
 
-	afterEach(function() {
-		sandbox.restore();
-	});
+				afterEach(function() {
+					sandbox.restore();
+				});
 
-	it('has sensible defaults', function() {
-		expect(searchWidgetBasic.searchAction).to.be.undefined;
-		expect(searchWidgetBasic.searchFieldName).to.equal('search');
-	});
+				it('has sensible defaults', function() {
+					expect(searchWidgetBasic.searchAction).to.be.undefined;
+					expect(searchWidgetBasic.searchFieldName).to.equal('search');
+				});
 
-	it('can have searchAction and searchFieldName set', function() {
-		searchWidgetBasic.searchAction = entity.actions[0];
-		searchWidgetBasic.searchFieldName = 'query';
-		expect(searchWidgetBasic.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
-		expect(searchWidgetBasic.searchFieldName).to.equal('query');
-	});
+				it('can have searchAction and searchFieldName set', function() {
+					searchWidgetBasic.searchAction = entity.actions[0];
+					searchWidgetBasic.searchFieldName = 'query';
+					expect(searchWidgetBasic.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
+					expect(searchWidgetBasic.searchFieldName).to.equal('query');
+				});
 
-	it('correctly parses search-action and search-field-name attributes', function() {
-		expect(searchWidget.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
-		expect(searchWidget.searchFieldName).to.equal('query');
-	});
+				it('correctly parses search-action and search-field-name attributes', function() {
+					expect(searchWidget.searchAction).to.be.an('object').with.property('name').that.equals('do-a-thing');
+					expect(searchWidget.searchFieldName).to.equal('query');
+				});
 
-	it('should set the search input to be the passed-in search field value, if applicable', function() {
-		entity.actions[0].fields[0].value = 'foo';
-		searchWidgetBasic.searchFieldName = 'query';
-		searchWidgetBasic.searchAction = entity.actions[0];
-		expect(searchWidgetBasic._searchInput).to.equal('foo');
-	});
+				it('should set the search input to be the passed-in search field value, if applicable', function() {
+					entity.actions[0].fields[0].value = 'foo';
+					searchWidgetBasic.searchFieldName = 'query';
+					searchWidgetBasic.searchAction = entity.actions[0];
+					expect(searchWidgetBasicInput.value).to.equal('foo');
+				});
 
-	it('should fire a d2l-search-widget-results-changed event when search completes', function(done) {
-		searchWidget._searchInput = 'foo';
-		var listener = function(e) {
-			expect(e.detail).to.be.an('object');
-			expect(e.detail.properties.name).to.equal('a-thing');
-			document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-			done();
-		};
-		document.addEventListener('d2l-search-widget-results-changed', listener);
-		searchWidget.search();
-	});
+				it('should fire a d2l-search-widget-results-changed event when search completes', function(done) {
+					searchWidgetInput.value = 'foo';
+					var listener = function(e) {
+						expect(e.detail).to.be.an('object');
+						expect(e.detail.properties.name).to.equal('a-thing');
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					setTimeout(function() {
+						searchWidget.search();
+					}, 100);
+				});
 
-	it('should fire a d2l-search-widget-results-changed event when the search is cleared', function(done) {
-		searchWidget._searchInput = 'foo';
-		searchWidget.search();
-		var listener = function() {
-			document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-			done();
-		};
-		document.addEventListener('d2l-search-widget-results-changed', listener);
-		searchWidget.clear();
-	});
+				it('should fire a d2l-search-widget-results-changed event when the search is cleared', function(done) {
+					var cleared = false;
+					searchWidgetInput.value = 'foo';
+					var listener = function() {
+						if (cleared) {
+							document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+							done();
+						} else {
+							cleared = true;
+							searchWidget.clear();
+						}
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					setTimeout(function() {
+						searchWidget.search();
+					}, 100);
+				});
 
-	it('should URI-encode query strings', function(done) {
-		var spy = sandbox.spy(searchWidget, '_onSearchUrlChanged');
+				it('should URI-encode query strings', function(done) {
+					var spy = sandbox.spy(searchWidget, '_onSearchUrlChanged');
 
-		searchWidget._searchInput = 'something&something something';
-		var listener = function() {
-			expect(spy).to.have.been.calledWith(sinon.match('something%26something%20something'));
-			document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-			done();
-		};
-		document.addEventListener('d2l-search-widget-results-changed', listener);
-		searchWidget.search();
-	});
-
-	describe('button icon', function() {
-		beforeEach(function() {
-			searchWidget._searchInput = 'foo';
-		});
-
-		it('should default to a search icon and correct ARIA label', function() {
-			expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
-			expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
-		});
-
-		it('should change to an X icon when a non-empty search query is passed in', function() {
-			entity.actions[0].fields[0].value = 'foo';
-			searchWidgetBasic.searchFieldName = 'query';
-			searchWidgetBasic.searchAction = entity.actions[0];
-			expect(searchWidgetBasic._showClearIcon).to.be.true;
-			expect(searchWidgetBasic.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
-			expect(searchWidgetBasic.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
-		});
-
-		it('should change to an X icon when a search is done', function(done) {
-			var listener = function() {
-				expect(searchWidget._showClearIcon).to.be.true;
-				expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
-				expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
-				document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-				done();
-			};
-			document.addEventListener('d2l-search-widget-results-changed', listener);
-			searchWidget.$$('button').click();
-		});
-
-		it('should change to a search icon when cleared', function(done) {
-			searchWidget.search();
-			expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
-
-			var listener = function() {
-				expect(searchWidget._showClearIcon).to.be.false;
-				expect(searchWidget.$$('d2l-icon').getAttribute('icon')).to.contain('search');
-				expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
-				document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-				done();
-			};
-			document.addEventListener('d2l-search-widget-results-changed', listener);
-			searchWidget.$$('button').click();
-		});
-
-		it('should switch back to search icon when search string is updated', function(done) {
-			var listener = function() {
-				expect(searchWidget._showClearIcon).to.be.true;
-				expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('close-default');
-				expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Clear Search');
-
-				searchWidget._searchInput = 'foobar';
-				expect(searchWidget._showClearIcon).to.be.false;
-				expect(searchWidget.$$('button > d2l-icon').getAttribute('icon')).to.contain('search');
-				expect(searchWidget.$$('button').getAttribute('aria-label')).to.equal('Search');
-				document.removeEventListener('d2l-search-widget-results-changed', listener, false);
-				done();
-			};
-			document.addEventListener('d2l-search-widget-results-changed', listener);
-			searchWidget.$$('button').click();
-		});
-	});
-});
-</script>
+					searchWidgetInput.value = 'something&something something';
+					var listener = function() {
+						expect(spy).to.have.been.calledWith(sinon.match('something%26something%20something'));
+						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
+						done();
+					};
+					document.addEventListener('d2l-search-widget-results-changed', listener);
+					setTimeout(function() {
+						searchWidget.search();
+					}, 100);
+				});
+			});
+		</script>
 	</body>
 </html>
