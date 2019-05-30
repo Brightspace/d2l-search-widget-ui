@@ -34,11 +34,8 @@
   },
   "main": "d2l-search-widget.js",
   "dependencies": {
-    "d2l-colors": "BrightspaceUI/colors#semver:^4",
     "d2l-fetch": "Brightspace/d2l-fetch.git#semver:^2",
-    "d2l-icons": "BrightspaceUI/icons#semver:^6",
-    "d2l-localize-behavior": "BrightspaceUI/localize-behavior#semver:^2",
-    "@polymer/iron-input": "^3.0.0-pre.18",
+    "d2l-inputs": "BrightspaceUI/inputs#semver:^2",
     "@polymer/polymer": "^3.0.0",
     "siren-parser": "^8.0.0"
   }

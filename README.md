@@ -32,16 +32,8 @@ The `d2l-search-widget` takes a Siren Hypermedia action as a `search-action` att
 
 A `d2l-search-widget-results-changed` event is fired when the search completes. The event's `value` will contain the response, parsed with `node-siren-parser`.
 
-The widget will have a default height of 60px; this can be overridden with `--d2l-search-widget-height`.
-
 ```html
 <link rel="import" href="../d2l-search-widget/d2l-search-widget">
-
-<style>
-d2l-search-widget {
-	--d2l-search-widget-height: 50px;
-}
-</style>
 
 <d2l-search-widget
 	search-action='{

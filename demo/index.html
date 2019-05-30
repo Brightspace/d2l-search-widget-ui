@@ -42,9 +42,6 @@ $_documentContainer.innerHTML = `<style>
 			html {
 				font-size: 20px;
 			}
-			.small {
-				--d2l-search-widget-height: 40px;
-			}
 			</style>`;
 
 document.body.appendChild($_documentContainer.content);
@@ -59,7 +56,7 @@ $_documentContainer.innerHTML = `<div class="vertical-section-container centered
 			<h3>Normal search</h3>
 			<demo-snippet>
 				<template>
-					<d2l-search-widget placeholder-text="Type and hit Enter or click icon to search!" search-button-label="ARIA Search label" clear-button-label="ARIA Clear label" search-action="{&quot;name&quot;:&quot;search-course-collection&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;href&quot;:&quot;/components/d2l-search-widget/demo/response.json&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;search&quot;,&quot;type&quot;:&quot;search&quot;,&quot;value&quot;:&quot;&quot;}]}" search-field-name="search"></d2l-search-widget>
+					<d2l-search-widget placeholder-text="Type and hit Enter or click icon to search!" search-label="ARIA Search label" search-action="{&quot;name&quot;:&quot;search-course-collection&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;href&quot;:&quot;/components/d2l-search-widget/demo/response.json&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;search&quot;,&quot;type&quot;:&quot;search&quot;,&quot;value&quot;:&quot;&quot;}]}" search-field-name="search"></d2l-search-widget>
 					<p>Result:
 						</p><ul id="result"></ul>
 					<p></p>
@@ -71,16 +68,6 @@ $_documentContainer.innerHTML = `<div class="vertical-section-container centered
 				<template>
 					<d2l-search-widget id="manual-search" placeholder-text="Type and hit Enter, click icon, or click Go to search!" search-action="{&quot;name&quot;:&quot;search-course-collection&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;href&quot;:&quot;/components/d2l-search-widget/demo/response.json&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;search&quot;,&quot;type&quot;:&quot;search&quot;,&quot;value&quot;:&quot;&quot;}]}" search-field-name="search"></d2l-search-widget>
 					<button id="go-button">Go!</button>
-					<p>Result:
-						</p><ul id="result"></ul>
-					<p></p>
-				</template>
-			</demo-snippet>
-
-			<h3>Small widget</h3>
-			<demo-snippet>
-				<template>
-					<d2l-search-widget placeholder-text="I'm a small search field" class="small" search-action="{&quot;name&quot;:&quot;search-course-collection&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;href&quot;:&quot;/components/d2l-search-widget/demo/response.json&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;search&quot;,&quot;type&quot;:&quot;search&quot;,&quot;value&quot;:&quot;&quot;}]}" search-field-name="search"></d2l-search-widget>
 					<p>Result:
 						</p><ul id="result"></ul>
 					<p></p>
