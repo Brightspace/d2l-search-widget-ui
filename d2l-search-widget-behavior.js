@@ -24,8 +24,6 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 			type: String,
 			value: 'search'
 		},
-		// The Entity returned by the search Action
-		searchResults: Object,
 		// ARIA label used for the search input. Should be localized by element consumer.
 		searchLabel: {
 			type: String
@@ -125,8 +123,7 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 	},
 
 	_onSearchResponse: function(searchResponse) {
-		this.set('searchResults', searchResponse || {});
-		this.fire('d2l-search-widget-results-changed', this.searchResults);
+		this.fire('d2l-search-widget-results-changed', searchResponse || {});
 	},
 
 	_onSearchUrlChanged: function(url) {
