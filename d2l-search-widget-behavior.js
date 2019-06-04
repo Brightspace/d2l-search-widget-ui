@@ -128,9 +128,10 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 	},
 
 	_onSearchResponse: function(searchResponse) {
-		var detail = {};
-		detail.searchValue = this._getSearchInput().value;
-		detail.searchResponse = searchResponse;
+		var detail = {
+			searchValue: this._getSearchInput().value,
+			searchResponse: searchResponse
+		};
 		this.fire('d2l-search-widget-results-changed', detail);
 	},
 
