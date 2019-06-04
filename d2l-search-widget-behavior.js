@@ -24,6 +24,11 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 			type: String,
 			value: 'search'
 		},
+		// Optional query params to add to the search url
+		searchQuery: {
+			type: Object,
+			value: {}
+		},
 		// ARIA label used for the search input. Should be localized by element consumer.
 		searchLabel: {
 			type: String
@@ -76,7 +81,7 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 			return;
 		}
 
-		var query = {};
+		var query = this.searchQuery;
 		query[this.searchFieldName] = encodeURIComponent(searchValue);
 
 		this.set('_searchUrl', this._createActionUrl(this._searchAction, query));

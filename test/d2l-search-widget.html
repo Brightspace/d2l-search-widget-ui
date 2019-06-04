@@ -18,8 +18,9 @@
 		<test-fixture id="SearchWidget">
 			<template>
 				<d2l-search-widget
-					search-action='{"name": "do-a-thing", "method": "GET", "href": "/some/url", "fields": [{"name": "query", "type": "search", "value": ""}]}'
-					search-field-name="query"></d2l-search-widget>
+					search-action='{"name": "do-a-thing", "method": "GET", "href": "/some/url", "fields": [{"name": "query", "type": "search", "value": ""}, {"name": "pageSize", "type": "number", "value": 20}]}'
+					search-field-name="query"
+					search-query='{"pageSize": 40}'></d2l-search-widget>
 			</template>
 		</test-fixture>
 
@@ -70,6 +71,7 @@
 				it('has sensible defaults', function() {
 					expect(searchWidgetBasic.searchAction).to.be.undefined;
 					expect(searchWidgetBasic.searchFieldName).to.equal('search');
+					expect(searchWidgetBasic.searchQuery).to.be.an('object').that.is.empty;
 				});
 
 				it('can have searchAction and searchFieldName set', function() {
@@ -123,12 +125,12 @@
 					}, 100);
 				});
 
-				it('should URI-encode query strings', function(done) {
+				it('should URI-encode query strings and add searchQuery values correctly', function(done) {
 					var spy = sandbox.spy(searchWidget, '_onSearchUrlChanged');
 
 					searchWidgetInput.value = 'something&something something';
 					var listener = function() {
-						expect(spy).to.have.been.calledWith(sinon.match('something%26something%20something'));
+						expect(spy).to.have.been.calledWith(sinon.match('query=something%26something%20something&pageSize=40'));
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
