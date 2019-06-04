@@ -98,7 +98,8 @@ window.requestAnimationFrame(function() {
 document.body.addEventListener('d2l-search-widget-results-changed', function(e) {
 	var results = e.target.parentNode.querySelector('#result');
 	var result = document.createElement('li');
-	result.innerHTML = e.detail.properties.name;
+	result.innerHTML = "'" + e.detail.searchValue + "': ";
+	result.innerHTML += e.detail.searchResponse.properties.name;
 	results.appendChild(result);
 });
 </script>

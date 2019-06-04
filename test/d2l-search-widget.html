@@ -96,8 +96,9 @@
 				it('should fire a d2l-search-widget-results-changed event when search completes', function(done) {
 					searchWidgetInput.value = 'foo';
 					var listener = function(e) {
-						expect(e.detail).to.be.an('object');
-						expect(e.detail.properties.name).to.equal('a-thing');
+						expect(e.detail.searchResponse).to.be.an('object');
+						expect(e.detail.searchResponse.properties.name).to.equal('a-thing');
+						expect(e.detail.searchValue).to.equal('foo');
 						document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 						done();
 					};
@@ -110,8 +111,9 @@
 				it('should fire a d2l-search-widget-results-changed event when the search is cleared', function(done) {
 					var cleared = false;
 					searchWidgetInput.value = 'foo';
-					var listener = function() {
+					var listener = function(e) {
 						if (cleared) {
+							expect(e.detail.searchValue).to.equal('');
 							document.removeEventListener('d2l-search-widget-results-changed', listener, false);
 							done();
 						} else {
