@@ -128,7 +128,11 @@ D2L.PolymerBehaviors.SearchWidgetBehavior = {
 	},
 
 	_onSearchResponse: function(searchResponse) {
-		this.fire('d2l-search-widget-results-changed', searchResponse || {});
+		var detail = {
+			searchValue: this._getSearchInput().value,
+			searchResponse: searchResponse
+		};
+		this.fire('d2l-search-widget-results-changed', detail);
 	},
 
 	_onSearchUrlChanged: function(url) {
